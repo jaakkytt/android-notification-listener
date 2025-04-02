@@ -1,23 +1,38 @@
 package ee.kytt.androidnotificationlistener
 
 import android.content.Intent
+import android.content.SharedPreferences
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ee.kytt.androidnotificationlistener.ui.theme.AndroidNotificationListenerTheme
+import androidx.core.content.edit
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -26,7 +41,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             AndroidNotificationListenerTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    NotificationAccessButton(
+                    NotificationAccessUI(
                         modifier = Modifier.padding(innerPadding)
                     )
                 }
@@ -36,28 +51,107 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun NotificationAccessButton(modifier: Modifier = Modifier) {
+fun NotificationAccessUI(modifier: Modifier = Modifier) {
     val context = LocalContext.current
-    Surface(
-        modifier = modifier.fillMaxSize(),
-        color = Color(0xFFBBDEFB)
+    val prefs = context.getSharedPreferences("app_prefs", ComponentActivity.MODE_PRIVATE)
+    val savedUrl = remember { mutableStateOf(prefs.getString("callback_url", "") ?: "") }
+    var urlText by remember { mutableStateOf(TextFieldValue(savedUrl.value)) }
+    val latestTitle = remember { mutableStateOf(prefs.getString("latestTitle", "") ?: "") }
+    val latestPackage = remember { mutableStateOf(prefs.getString("latestPackageName", "No attempts yet") ?: "No attempts yet") }
+    val latestStatus = remember { mutableStateOf(prefs.getString("latestStatus", "No attempts yet") ?: "No attempts yet") }
+    val listener = remember {
+        SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
+            when (key) {
+                "latestTitle" -> latestTitle.value = prefs.getString("latestTitle", "") ?: ""
+                "latestPackageName" -> latestPackage.value = prefs.getString("latestPackageName", "No attempts yet") ?: "No attempts yet"
+                "latestStatus" -> latestStatus.value = prefs.getString("latestStatus", "No attempts yet") ?: "No attempts yet"
+            }
+        }
+    }
+    DisposableEffect(Unit) {
+        prefs.registerOnSharedPreferenceChangeListener(listener)
+        onDispose {
+            prefs.unregisterOnSharedPreferenceChangeListener(listener)
+        }
+    }
+
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .padding(24.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
     ) {
+        Text(text = "Enter Callback URL", style = MaterialTheme.typography.bodyLarge)
+        Spacer(modifier = Modifier.height(8.dp))
+
+        OutlinedTextField(
+            value = urlText,
+            onValueChange = { urlText = it },
+            label = {
+                if (savedUrl.value.isNotEmpty()) {
+                    Text("Saved")
+                } else {
+                    Text("Not set")
+                }
+            },
+            singleLine = true,
+            modifier = Modifier.fillMaxWidth()
+        )
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        Button(
+            onClick = {
+                val newUrl = urlText.text
+                prefs.edit() { putString("callback_url", urlText.text) }
+                savedUrl.value = newUrl
+            },
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text("Save URL")
+        }
+
+        Spacer(modifier = Modifier.height(32.dp))
+
         Button(
             onClick = {
                 val intent = Intent("android.settings.ACTION_NOTIFICATION_LISTENER_SETTINGS")
                 context.startActivity(intent)
             },
-            modifier = modifier.padding(48.dp)
+            modifier = Modifier.fillMaxWidth()
         ) {
             Text("Enable Notification Access")
         }
+
+        Spacer(modifier = Modifier.height(64.dp))
+
+        Text("Latest Notification Sent", style = MaterialTheme.typography.titleMedium)
+
+        Spacer(modifier = Modifier.height(4.dp))
+
+        val isSuccess = latestStatus.value.startsWith("Success", ignoreCase = true)
+        val statusColor = if (isSuccess) Color.Green else Color.Red
+
+        Text(
+            text = latestPackage.value,
+            color = statusColor,
+            style = MaterialTheme.typography.bodyLarge
+        )
+        Text(
+            text = latestTitle.value,
+            color = statusColor,
+            style = MaterialTheme.typography.bodyMedium
+        )
+
+        Spacer(modifier = Modifier.height(24.dp))
     }
 }
 
 @Preview(showBackground = true)
 @Composable
-fun NotificationAccessButtonPreview() {
+fun NotificationAccessUIPreview() {
     AndroidNotificationListenerTheme {
-        NotificationAccessButton()
+        NotificationAccessUI()
     }
 }

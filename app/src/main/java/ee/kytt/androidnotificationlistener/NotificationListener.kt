@@ -1,6 +1,7 @@
 package ee.kytt.androidnotificationlistener
 
 import android.app.Notification
+import android.content.Context
 import android.service.notification.NotificationListenerService
 import android.service.notification.StatusBarNotification
 import android.util.Log
@@ -39,13 +40,24 @@ class NotificationListener : NotificationListenerService() {
             Category: $category
         """.trimIndent())
 
+        val context = applicationContext
+        val prefs = context.getSharedPreferences("app_prefs", MODE_PRIVATE)
+        val url = prefs.getString("callback_url", null)
+
+        if (url.isNullOrEmpty()) {
+            Log.w("NotificationListener", "No callback URL set")
+            return
+        }
+
         sendNotificationToServer(
+            url,
             packageName,
             title,
             text,
             subText,
             bigText,
-            category
+            category,
+            context
         )
     }
 
@@ -54,12 +66,14 @@ class NotificationListener : NotificationListenerService() {
     }
 
     private fun sendNotificationToServer(
+        url: String,
         packageName: String,
         title: String?,
         text: String?,
         subText: String?,
         bigText: String?,
-        category: String?
+        category: String?,
+        context: Context
     ) {
         val json = JSONObject().apply {
             put("package", packageName)
@@ -74,17 +88,32 @@ class NotificationListener : NotificationListenerService() {
         val body = json.toString().toRequestBody(mediaType)
 
         val request = Request.Builder()
-            .url("https://f440-85-253-101-13.ngrok-free.app/send/logs")
+            .url(url)
             .post(body)
             .build()
 
         client.newCall(request).enqueue(object : Callback {
-            override fun onFailure(call: Call, e: IOException) {
-                Log.e("NotificationPoster", "Failed to post notification", e)
-            }
-
             override fun onResponse(call: Call, response: Response) {
                 Log.d("NotificationPoster", "Response: ${response.code}")
+                val prefs = context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
+                val status = if (response.code == 200) "Success" else "Fail"
+                prefs.edit().apply {
+                    putString("latestTitle", text ?: title)
+                    putString("latestPackageName", packageName)
+                    putString("latestStatus", status)
+                    apply()
+                }
+            }
+
+            override fun onFailure(call: Call, e: IOException) {
+                Log.e("NotificationPoster", "Failed to post notification", e)
+                val prefs = context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
+                prefs.edit().apply {
+                    putString("latestTitle", text ?: title)
+                    putString("latestPackageName", packageName)
+                    putString("latestStatus", "Failed: ${e.message}")
+                    apply()
+                }
             }
         })
     }
