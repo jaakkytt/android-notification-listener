@@ -1,17 +1,20 @@
 package ee.kytt.androidnotificationlistener
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Button
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ee.kytt.androidnotificationlistener.ui.theme.AndroidNotificationListenerTheme
@@ -23,8 +26,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             AndroidNotificationListenerTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
+                    NotificationAccessButton(
                         modifier = Modifier.padding(innerPadding)
                     )
                 }
@@ -34,19 +36,28 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Surface(color = Color.Cyan) {
-        Text(
-            text = "Hi, my name is $name!",
-            modifier = modifier.padding(24.dp)
-        )
+fun NotificationAccessButton(modifier: Modifier = Modifier) {
+    val context = LocalContext.current
+    Surface(
+        modifier = modifier.fillMaxSize(),
+        color = Color(0xFFBBDEFB)
+    ) {
+        Button(
+            onClick = {
+                val intent = Intent("android.settings.ACTION_NOTIFICATION_LISTENER_SETTINGS")
+                context.startActivity(intent)
+            },
+            modifier = modifier.padding(48.dp)
+        ) {
+            Text("Enable Notification Access")
+        }
     }
 }
 
-@Preview(showBackground = false)
+@Preview(showBackground = true)
 @Composable
-fun GreetingPreview() {
+fun NotificationAccessButtonPreview() {
     AndroidNotificationListenerTheme {
-        Greeting("Meghan")
+        NotificationAccessButton()
     }
 }
