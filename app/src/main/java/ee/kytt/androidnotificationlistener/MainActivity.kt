@@ -126,7 +126,7 @@ fun NotificationAccessUI(modifier: Modifier = Modifier) {
 
         Spacer(modifier = Modifier.height(64.dp))
 
-        Text("Latest Notification Sent", style = MaterialTheme.typography.titleMedium)
+        Text("Latest Notification", style = MaterialTheme.typography.titleMedium)
 
         Spacer(modifier = Modifier.height(4.dp))
 
