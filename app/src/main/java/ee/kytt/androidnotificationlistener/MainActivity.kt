@@ -41,10 +41,12 @@ import androidx.work.*
 import ee.kytt.androidnotificationlistener.service.NotificationSyncWorker
 import java.util.concurrent.TimeUnit.MINUTES
 
+const val PREF_SYNC_ENABLED = "sync_enabled"
+const val SYNC_WORK_NAME = "notification_sync"
+
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        schedulePeriodicNotificationSync(applicationContext)
         enableEdgeToEdge()
         setContent {
             AndroidNotificationListenerTheme {
@@ -62,11 +64,13 @@ class MainActivity : ComponentActivity() {
 fun NotificationAccessUI(modifier: Modifier = Modifier) {
     val context = LocalContext.current
     val prefs = context.getSharedPreferences("app_prefs", ComponentActivity.MODE_PRIVATE)
+    val syncEnabledState = remember { mutableStateOf(isSyncEnabled(context)) }
     val savedUrl = remember { mutableStateOf(prefs.getString("callback_url", "") ?: "") }
     var urlText by remember { mutableStateOf(TextFieldValue(savedUrl.value)) }
     val latestTitle = remember { mutableStateOf(prefs.getString("latestTitle", "") ?: "") }
     val latestPackage = remember { mutableStateOf(prefs.getString("latestPackageName", "No attempts yet") ?: "No attempts yet") }
     val latestStatus = remember { mutableStateOf(prefs.getString("latestStatus", "No attempts yet") ?: "No attempts yet") }
+
     val listener = remember {
         SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
             when (key) {
@@ -76,6 +80,7 @@ fun NotificationAccessUI(modifier: Modifier = Modifier) {
             }
         }
     }
+
     DisposableEffect(Unit) {
         prefs.registerOnSharedPreferenceChangeListener(listener)
         onDispose {
@@ -137,6 +142,26 @@ fun NotificationAccessUI(modifier: Modifier = Modifier) {
 
         Button(
             onClick = {
+                toggleBackgroundSync(context)
+                syncEnabledState.value = !syncEnabledState.value
+
+                val message = if (syncEnabledState.value) {
+                    "Background sync enabled"
+                } else {
+                    "Background sync disabled"
+                }
+                Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+            },
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            val label = if (syncEnabledState.value) "Disable Background Sync" else "Enable Background Sync"
+            Text(label)
+        }
+
+        Spacer(modifier = Modifier.height(32.dp))
+
+        Button(
+            onClick = {
                 triggerOneTimeNotificationSync(context)
                 Toast.makeText(context, "Sync started", Toast.LENGTH_SHORT).show()
             },
@@ -177,20 +202,34 @@ fun NotificationAccessUIPreview() {
     }
 }
 
-fun schedulePeriodicNotificationSync(context: Context) {
-    val request = PeriodicWorkRequestBuilder<NotificationSyncWorker>(15, MINUTES)
-        .setConstraints(
-            Constraints.Builder()
-                .setRequiredNetworkType(NetworkType.CONNECTED)
-                .build()
-        )
-        .build()
+fun isSyncEnabled(context: Context): Boolean {
+    val prefs = context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
+    return prefs.getBoolean(PREF_SYNC_ENABLED, false)
+}
 
-    WorkManager.getInstance(context).enqueueUniquePeriodicWork(
-        "notification_sync",
-        ExistingPeriodicWorkPolicy.CANCEL_AND_REENQUEUE,
-        request
-    )
+fun toggleBackgroundSync(context: Context) {
+    val prefs = context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
+    val currentlyEnabled = isSyncEnabled(context)
+
+    if (currentlyEnabled) {
+        WorkManager.getInstance(context).cancelUniqueWork(SYNC_WORK_NAME)
+    } else {
+        val request = PeriodicWorkRequestBuilder<NotificationSyncWorker>(15, MINUTES)
+            .setConstraints(
+                Constraints.Builder()
+                    .setRequiredNetworkType(NetworkType.CONNECTED)
+                    .build()
+            )
+            .build()
+
+        WorkManager.getInstance(context).enqueueUniquePeriodicWork(
+            SYNC_WORK_NAME,
+            ExistingPeriodicWorkPolicy.CANCEL_AND_REENQUEUE,
+            request
+        )
+    }
+
+    prefs.edit() { putBoolean(PREF_SYNC_ENABLED, !currentlyEnabled) }
 }
 
 fun triggerOneTimeNotificationSync(context: Context) {
