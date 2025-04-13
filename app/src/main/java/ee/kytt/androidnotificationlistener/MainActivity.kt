@@ -10,6 +10,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -33,12 +34,16 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import ee.kytt.androidnotificationlistener.ui.theme.AndroidNotificationListenerTheme
 import androidx.core.content.edit
 import androidx.work.Constraints
+import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.ExistingWorkPolicy
 import androidx.work.NetworkType
-import androidx.work.*
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.PeriodicWorkRequestBuilder
+import androidx.work.WorkManager
 import ee.kytt.androidnotificationlistener.service.NotificationSyncWorker
+import ee.kytt.androidnotificationlistener.ui.theme.AndroidNotificationListenerTheme
 import java.util.concurrent.TimeUnit.MINUTES
 
 const val PREF_SYNC_ENABLED = "sync_enabled"
@@ -64,13 +69,18 @@ class MainActivity : ComponentActivity() {
 fun NotificationAccessUI(modifier: Modifier = Modifier) {
     val context = LocalContext.current
     val prefs = context.getSharedPreferences("app_prefs", ComponentActivity.MODE_PRIVATE)
+
     val syncEnabledState = remember { mutableStateOf(isSyncEnabled(context)) }
+
     val savedUrl = remember { mutableStateOf(prefs.getString("callback_url", "") ?: "") }
     var urlText by remember { mutableStateOf(TextFieldValue(savedUrl.value)) }
+
+    val savedPattern = remember { mutableStateOf(prefs.getString("package_pattern", "") ?: "") }
+    var patternText by remember { mutableStateOf(TextFieldValue(savedPattern.value)) }
+
     val latestTitle = remember { mutableStateOf(prefs.getString("latestTitle", "") ?: "") }
     val latestPackage = remember { mutableStateOf(prefs.getString("latestPackageName", "No attempts yet") ?: "No attempts yet") }
     val latestStatus = remember { mutableStateOf(prefs.getString("latestStatus", "No attempts yet") ?: "No attempts yet") }
-
     val listener = remember {
         SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
             when (key) {
@@ -95,17 +105,14 @@ fun NotificationAccessUI(modifier: Modifier = Modifier) {
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        Text(text = "Enter Callback URL", style = MaterialTheme.typography.bodyLarge)
-        Spacer(modifier = Modifier.height(8.dp))
-
         OutlinedTextField(
             value = urlText,
             onValueChange = { urlText = it },
             label = {
                 if (savedUrl.value.isNotEmpty()) {
-                    Text("Saved")
+                    Text("Callback URL")
                 } else {
-                    Text("Not set")
+                    Text("Callback URL not set")
                 }
             },
             singleLine = true,
@@ -114,16 +121,54 @@ fun NotificationAccessUI(modifier: Modifier = Modifier) {
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        Button(
-            onClick = {
-                val newUrl = urlText.text
-                prefs.edit() { putString("callback_url", urlText.text) }
-                savedUrl.value = newUrl
-                Toast.makeText(context, "Url saved", Toast.LENGTH_SHORT).show()
-            },
-            modifier = Modifier.fillMaxWidth()
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.End
         ) {
-            Text("Save URL")
+            Button(
+                onClick = {
+                    val newUrl = urlText.text
+                    prefs.edit() { putString("callback_url", urlText.text) }
+                    savedUrl.value = newUrl
+                    Toast.makeText(context, "Url saved", Toast.LENGTH_SHORT).show()
+                }
+            ) {
+                Text("Save URL")
+            }
+        }
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        OutlinedTextField(
+            value = patternText,
+            onValueChange = { patternText = it },
+            label = {
+                if (savedPattern.value.isNotEmpty()) {
+                    Text("Monitor matching applications")
+                } else {
+                    Text("Monitor all applications")
+                }
+            },
+            singleLine = true,
+            modifier = Modifier.fillMaxWidth()
+        )
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.End
+        ) {
+            Button(
+                onClick = {
+                    val newPattern = patternText.text
+                    prefs.edit() { putString("package_pattern", patternText.text) }
+                    savedPattern.value = newPattern
+                    Toast.makeText(context, "Pattern saved", Toast.LENGTH_SHORT).show()
+                }
+            ) {
+                Text("Save pattern")
+            }
         }
 
         Spacer(modifier = Modifier.height(32.dp))
@@ -170,7 +215,7 @@ fun NotificationAccessUI(modifier: Modifier = Modifier) {
             Text("Sync Failed Notifications Now")
         }
 
-        Spacer(modifier = Modifier.height(64.dp))
+        Spacer(modifier = Modifier.height(32.dp))
 
         Text("Latest Notification", style = MaterialTheme.typography.titleMedium)
 

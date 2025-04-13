@@ -18,12 +18,17 @@ class NotificationListener : NotificationListenerService() {
 
     override fun onNotificationPosted(sbn: StatusBarNotification) {
         val notification = Notification(sbn)
-
-        Log.d("NotificationListener", Json.Default.encodeToString(notification))
-
         val context = applicationContext
         val prefs = context.getSharedPreferences("app_prefs", MODE_PRIVATE)
         val url = prefs.getString("callback_url", null)
+        val packagePattern = prefs.getString("package_pattern", null) ?: ""
+
+        Log.d("NotificationListener", Json.Default.encodeToString(notification))
+
+        if (!shouldMatch(packagePattern, notification.packageName)) {
+            Log.d("NotificationListener", "Ignoring notification from package: ${notification.packageName}")
+            return
+        }
 
         if (url.isNullOrEmpty()) {
             Log.w("NotificationListener", "No callback URL set")
@@ -51,6 +56,18 @@ class NotificationListener : NotificationListenerService() {
             db.notificationDao().insert(notification)
             val failed = db.notificationDao().count()
             Log.d("NotificationListener", "Saved failed notification to local DB, unsynced count: $failed")
+        }
+    }
+
+    private fun shouldMatch(packagePattern: String, name: String): Boolean {
+        if (packagePattern.isBlank()) {
+            return true
+        }
+        return try {
+            return Regex(packagePattern).containsMatchIn(name)
+        } catch (e: Exception) {
+            Log.w("NotificationListener", "Invalid regex pattern: $packagePattern", e)
+            false
         }
     }
 
