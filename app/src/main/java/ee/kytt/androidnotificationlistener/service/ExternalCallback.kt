@@ -2,13 +2,14 @@ package ee.kytt.androidnotificationlistener.service
 
 import android.util.Log
 import ee.kytt.androidnotificationlistener.dto.Notification
+import ee.kytt.androidnotificationlistener.dto.SyncResult
 import kotlinx.serialization.json.Json
+import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.RequestBody.Companion.toRequestBody
 import okhttp3.Call
 import okhttp3.Callback
-import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.Request
-import okhttp3.RequestBody.Companion.toRequestBody
 import okhttp3.Response
 import java.io.IOException
 
@@ -16,32 +17,58 @@ class ExternalCallback {
 
     private val client = OkHttpClient()
 
-    fun sendNotificationToServer(
+    fun sendAsync(
         url: String,
         notification: Notification,
-        callback: (Boolean, String) -> Unit
+        callback: (SyncResult) -> Unit
     ) {
-        val json = Json.encodeToString(notification)
-        val mediaType = "application/json; charset=utf-8".toMediaType()
-        val body = json.toRequestBody(mediaType)
+        val request: Request
 
-        val request = Request.Builder()
-            .url(url)
-            .post(body)
-            .build()
+        try {
+            request = createRequest(url, notification)
+        } catch (e: Exception) {
+            Log.w("ExternalCallback", "Failed to create request", e)
+            callback(SyncResult(e))
+            return
+        }
 
         client.newCall(request).enqueue(object : Callback {
             override fun onResponse(call: Call, response: Response) {
-                Log.d("ExternalCallback", "Response: $response")
-                val status = if (response.isSuccessful) "Success" else "Failed: ${response.message}"
-                callback(response.isSuccessful, status)
+                response.use {
+                    Log.d("ExternalCallback", "Response: $response")
+                    callback(SyncResult(response))
+                }
             }
 
             override fun onFailure(call: Call, e: IOException) {
                 Log.e("ExternalCallback", "Failed to post notification", e)
-                callback(false, "Failed: ${e.message}" )
+                callback(SyncResult(e))
             }
         })
+    }
+
+    fun sendSync(url: String, notification: Notification): SyncResult {
+        try {
+            val request = createRequest(url, notification)
+            client.newCall(request).execute().use { response ->
+                Log.d("ExternalCallback", "Response: $response")
+                return SyncResult(response)
+            }
+        } catch (e: Exception) {
+            Log.w("ExternalCallback", "Failed to post notification", e)
+            return SyncResult(e)
+        }
+    }
+
+    private fun createRequest(url: String, notification: Notification): Request {
+        val json = Json.encodeToString(notification)
+        val mediaType = "application/json; charset=utf-8".toMediaType()
+        val body = json.toRequestBody(mediaType)
+
+        return Request.Builder()
+            .url(url)
+            .post(body)
+            .build()
     }
 
 }

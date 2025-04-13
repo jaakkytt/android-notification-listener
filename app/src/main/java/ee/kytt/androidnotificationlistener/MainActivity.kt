@@ -1,8 +1,10 @@
 package ee.kytt.androidnotificationlistener
 
+import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -33,10 +35,16 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ee.kytt.androidnotificationlistener.ui.theme.AndroidNotificationListenerTheme
 import androidx.core.content.edit
+import androidx.work.Constraints
+import androidx.work.NetworkType
+import androidx.work.*
+import ee.kytt.androidnotificationlistener.service.NotificationSyncWorker
+import java.util.concurrent.TimeUnit.MINUTES
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        schedulePeriodicNotificationSync(applicationContext)
         enableEdgeToEdge()
         setContent {
             AndroidNotificationListenerTheme {
@@ -106,6 +114,7 @@ fun NotificationAccessUI(modifier: Modifier = Modifier) {
                 val newUrl = urlText.text
                 prefs.edit() { putString("callback_url", urlText.text) }
                 savedUrl.value = newUrl
+                Toast.makeText(context, "Url saved", Toast.LENGTH_SHORT).show()
             },
             modifier = Modifier.fillMaxWidth()
         ) {
@@ -122,6 +131,18 @@ fun NotificationAccessUI(modifier: Modifier = Modifier) {
             modifier = Modifier.fillMaxWidth()
         ) {
             Text("Enable Notification Access")
+        }
+
+        Spacer(modifier = Modifier.height(32.dp))
+
+        Button(
+            onClick = {
+                triggerOneTimeNotificationSync(context)
+                Toast.makeText(context, "Sync started", Toast.LENGTH_SHORT).show()
+            },
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text("Sync Failed Notifications Now")
         }
 
         Spacer(modifier = Modifier.height(64.dp))
@@ -154,4 +175,36 @@ fun NotificationAccessUIPreview() {
     AndroidNotificationListenerTheme {
         NotificationAccessUI()
     }
+}
+
+fun schedulePeriodicNotificationSync(context: Context) {
+    val request = PeriodicWorkRequestBuilder<NotificationSyncWorker>(15, MINUTES)
+        .setConstraints(
+            Constraints.Builder()
+                .setRequiredNetworkType(NetworkType.CONNECTED)
+                .build()
+        )
+        .build()
+
+    WorkManager.getInstance(context).enqueueUniquePeriodicWork(
+        "notification_sync",
+        ExistingPeriodicWorkPolicy.CANCEL_AND_REENQUEUE,
+        request
+    )
+}
+
+fun triggerOneTimeNotificationSync(context: Context) {
+    val request = OneTimeWorkRequestBuilder<NotificationSyncWorker>()
+        .setConstraints(
+            Constraints.Builder()
+                .setRequiredNetworkType(NetworkType.CONNECTED)
+                .build()
+        )
+        .build()
+
+    WorkManager.getInstance(context).enqueueUniqueWork(
+        "manual_sync",
+        ExistingWorkPolicy.KEEP,
+        request
+    )
 }

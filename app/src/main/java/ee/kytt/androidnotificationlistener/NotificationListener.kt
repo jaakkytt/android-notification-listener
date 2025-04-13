@@ -27,18 +27,19 @@ class NotificationListener : NotificationListenerService() {
 
         if (url.isNullOrEmpty()) {
             Log.w("NotificationListener", "No callback URL set")
+            saveFailedNotification(notification, context)
             return
         }
 
-        callbackService.sendNotificationToServer(url, notification) { success, status ->
-            if (!success) {
+        callbackService.sendAsync(url, notification) { result ->
+            if (!result.success) {
                 saveFailedNotification(notification, context)
             }
 
             prefs.edit().apply {
-                putString("latestPackageName", notification.packageName)
                 putString("latestTitle", notification.description())
-                putString("latestStatus", status)
+                putString("latestPackageName", notification.packageName)
+                putString("latestStatus", result.status)
                 apply()
             }
         }
@@ -51,10 +52,6 @@ class NotificationListener : NotificationListenerService() {
             val failed = db.notificationDao().count()
             Log.d("NotificationListener", "Saved failed notification to local DB, unsynced count: $failed")
         }
-    }
-
-    override fun onNotificationRemoved(sbn: StatusBarNotification) {
-        Log.d("NotificationListener", "Notification Removed: " + sbn.packageName)
     }
 
 }
