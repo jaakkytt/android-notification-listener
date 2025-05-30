@@ -4,6 +4,14 @@ import android.content.Context
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import android.util.Log
+import ee.kytt.androidnotificationlistener.Constants.PREFS_NAME
+import ee.kytt.androidnotificationlistener.Constants.PREF_CALLBACK_URL
+import ee.kytt.androidnotificationlistener.Constants.PREF_FAIL_COUNT
+import ee.kytt.androidnotificationlistener.Constants.PREF_LAST_SUCCESS_TIME
+import ee.kytt.androidnotificationlistener.Constants.PREF_LATEST_ATTEMPT_TIME
+import ee.kytt.androidnotificationlistener.Constants.PREF_LATEST_PACKAGE_NAME
+import ee.kytt.androidnotificationlistener.Constants.PREF_LATEST_STATUS
+import ee.kytt.androidnotificationlistener.Constants.PREF_LATEST_TITLE
 import ee.kytt.androidnotificationlistener.persistence.NotificationDatabase
 
 class NotificationSyncWorker(
@@ -15,8 +23,8 @@ class NotificationSyncWorker(
     private val callbackService = ExternalCallback()
 
     override suspend fun doWork(): Result {
-        val prefs = applicationContext.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
-        val url = prefs.getString("callback_url", null)
+        val prefs = applicationContext.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        val url = prefs.getString(PREF_CALLBACK_URL, null)
 
         if (url.isNullOrEmpty()) {
             Log.w("NotificationSyncWorker", "No callback URL set")
@@ -37,11 +45,11 @@ class NotificationSyncWorker(
                 dao.delete(notification.id)
                 Log.d("NotificationSyncWorker", "Resent and deleted notification: ${notification.id}")
                 prefs.edit().apply {
-                    putString("latestTitle", notification.description())
-                    putString("latestPackageName", notification.packageName)
-                    putString("latestStatus", response.status)
-                    putLong("latestAttemptTime", System.currentTimeMillis())
-                    putLong("lastSuccessTime", System.currentTimeMillis())
+                    putString(PREF_LATEST_TITLE, notification.description())
+                    putString(PREF_LATEST_PACKAGE_NAME, notification.packageName)
+                    putString(PREF_LATEST_STATUS, response.status)
+                    putLong(PREF_LATEST_ATTEMPT_TIME, System.currentTimeMillis())
+                    putLong(PREF_LAST_SUCCESS_TIME, System.currentTimeMillis())
                     apply()
                 }
                 failedCount -= 1
@@ -49,9 +57,9 @@ class NotificationSyncWorker(
                 Log.w("NotificationSyncWorker", "Failed to resend notification: ${notification.id}, status: ${response.status}")
 
                 prefs.edit().apply {
-                    putInt("failCount", failedCount)
-                    putString("latestStatus", response.status)
-                    putLong("latestAttemptTime", System.currentTimeMillis())
+                    putInt(PREF_FAIL_COUNT, failedCount)
+                    putString(PREF_LATEST_STATUS, response.status)
+                    putLong(PREF_LATEST_ATTEMPT_TIME, System.currentTimeMillis())
                     apply()
                 }
 

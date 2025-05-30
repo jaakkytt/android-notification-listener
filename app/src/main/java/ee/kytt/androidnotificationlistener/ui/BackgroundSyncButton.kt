@@ -1,7 +1,6 @@
 package ee.kytt.androidnotificationlistener.ui
 
 import android.content.Context
-import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -21,6 +20,9 @@ import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.NetworkType
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
+import ee.kytt.androidnotificationlistener.Constants.PREFS_NAME
+import ee.kytt.androidnotificationlistener.Constants.PREF_SYNC_ENABLED
+import ee.kytt.androidnotificationlistener.Constants.BACKGROUND_WORK_NAME
 import ee.kytt.androidnotificationlistener.service.NotificationSyncWorker
 import java.util.concurrent.TimeUnit.MINUTES
 
@@ -59,16 +61,16 @@ fun BackgroundSyncButton(
 }
 
 fun isSyncEnabled(context: Context): Boolean {
-    val prefs = context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
-    return prefs.getBoolean("sync_enabled", false)
+    val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+    return prefs.getBoolean(PREF_SYNC_ENABLED, false)
 }
 
 fun toggleBackgroundSync(context: Context) {
-    val prefs = context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
+    val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
     val currentlyEnabled = isSyncEnabled(context)
 
     if (currentlyEnabled) {
-        WorkManager.getInstance(context).cancelUniqueWork("notification_sync")
+        WorkManager.getInstance(context).cancelUniqueWork(BACKGROUND_WORK_NAME)
     } else {
         val request = PeriodicWorkRequestBuilder<NotificationSyncWorker>(15, MINUTES)
             .setConstraints(
@@ -79,11 +81,11 @@ fun toggleBackgroundSync(context: Context) {
             .build()
 
         WorkManager.getInstance(context).enqueueUniquePeriodicWork(
-            "notification_sync",
+            BACKGROUND_WORK_NAME,
             ExistingPeriodicWorkPolicy.CANCEL_AND_REENQUEUE,
             request
         )
     }
 
-    prefs.edit() { putBoolean("sync_enabled", !currentlyEnabled) }
+    prefs.edit() { putBoolean(PREF_SYNC_ENABLED, !currentlyEnabled) }
 }

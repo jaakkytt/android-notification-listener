@@ -11,6 +11,7 @@ import androidx.work.ExistingWorkPolicy
 import androidx.work.NetworkType
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
+import ee.kytt.androidnotificationlistener.Constants.MANUAL_WORK_NAME
 import ee.kytt.androidnotificationlistener.service.NotificationSyncWorker
 
 @Composable
@@ -39,7 +40,7 @@ fun triggerOneTimeNotificationSync(context: Context) {
         .build()
 
     WorkManager.getInstance(context).enqueueUniqueWork(
-        "manual_sync",
+        MANUAL_WORK_NAME,
         ExistingWorkPolicy.KEEP,
         request
     )

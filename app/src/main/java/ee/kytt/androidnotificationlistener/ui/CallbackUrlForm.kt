@@ -20,14 +20,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.core.content.edit
+import ee.kytt.androidnotificationlistener.Constants.PREFS_NAME
+import ee.kytt.androidnotificationlistener.Constants.PREF_CALLBACK_URL
 
 @Composable
 fun CallbackUrlForm(
     context: Context,
     modifier: Modifier
 ) {
-    val prefs = context.getSharedPreferences("app_prefs", ComponentActivity.MODE_PRIVATE)
-    val savedUrl = remember { mutableStateOf(prefs.getString("callback_url", "") ?: "") }
+    val prefs = context.getSharedPreferences(PREFS_NAME, ComponentActivity.MODE_PRIVATE)
+    val savedUrl = remember { mutableStateOf(prefs.getString(PREF_CALLBACK_URL, "") ?: "") }
     var urlText by remember { mutableStateOf(TextFieldValue(savedUrl.value)) }
 
     OutlinedTextField(
@@ -53,7 +55,7 @@ fun CallbackUrlForm(
         Button(
             onClick = {
                 val newUrl = urlText.text
-                prefs.edit() { putString("callback_url", urlText.text) }
+                prefs.edit() { putString(PREF_CALLBACK_URL, urlText.text) }
                 savedUrl.value = newUrl
                 Toast.makeText(context, "Url saved", Toast.LENGTH_SHORT).show()
             }

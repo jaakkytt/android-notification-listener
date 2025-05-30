@@ -12,6 +12,13 @@ import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.Color
+import ee.kytt.androidnotificationlistener.Constants.PREFS_NAME
+import ee.kytt.androidnotificationlistener.Constants.PREF_FAIL_COUNT
+import ee.kytt.androidnotificationlistener.Constants.PREF_LAST_SUCCESS_TIME
+import ee.kytt.androidnotificationlistener.Constants.PREF_LATEST_ATTEMPT_TIME
+import ee.kytt.androidnotificationlistener.Constants.PREF_LATEST_PACKAGE_NAME
+import ee.kytt.androidnotificationlistener.Constants.PREF_LATEST_STATUS
+import ee.kytt.androidnotificationlistener.Constants.PREF_LATEST_TITLE
 import java.time.Instant
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
@@ -20,24 +27,24 @@ import java.time.format.DateTimeFormatter
 fun SyncStatusText(
     context: Context
 ) {
-    val prefs = context.getSharedPreferences("app_prefs", ComponentActivity.MODE_PRIVATE)
+    val prefs = context.getSharedPreferences(PREFS_NAME, ComponentActivity.MODE_PRIVATE)
 
-    val latestTitle = remember { mutableStateOf(prefs.getString("latestTitle", "") ?: "") }
-    val latestPackage = remember { mutableStateOf(prefs.getString("latestPackageName", "-") ?: "-") }
-    val latestStatus = remember { mutableStateOf(prefs.getString("latestStatus", "-") ?: "-") }
-    val latestAttemptTime = remember { mutableLongStateOf(prefs.getLong("latestAttemptTime", 0L)) }
-    val lastSuccessTime = remember { mutableLongStateOf(prefs.getLong("lastSuccessTime", 0L)) }
-    val failCount = remember { mutableIntStateOf(prefs.getInt("failCount", 0)) }
+    val latestTitle = remember { mutableStateOf(prefs.getString(PREF_LATEST_TITLE, "") ?: "") }
+    val latestPackage = remember { mutableStateOf(prefs.getString(PREF_LATEST_PACKAGE_NAME, "-") ?: "-") }
+    val latestStatus = remember { mutableStateOf(prefs.getString(PREF_LATEST_STATUS, "-") ?: "-") }
+    val latestAttemptTime = remember { mutableLongStateOf(prefs.getLong(PREF_LATEST_ATTEMPT_TIME, 0L)) }
+    val lastSuccessTime = remember { mutableLongStateOf(prefs.getLong(PREF_LAST_SUCCESS_TIME, 0L)) }
+    val failCount = remember { mutableIntStateOf(prefs.getInt(PREF_FAIL_COUNT, 0)) }
 
     val listener = remember {
         SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
             when (key) {
-                "latestTitle" -> latestTitle.value = prefs.getString("latestTitle", "") ?: ""
-                "latestPackageName" -> latestPackage.value = prefs.getString("latestPackageName", "-") ?: "-"
-                "latestStatus" -> latestStatus.value = prefs.getString("latestStatus", "-") ?: "-"
-                "latestAttemptTime" -> latestAttemptTime.longValue = prefs.getLong("latestAttemptTime", 0L)
-                "lastSuccessTime" -> lastSuccessTime.longValue = prefs.getLong("lastSuccessTime", 0L)
-                "failCount" -> failCount.intValue = prefs.getInt("failCount", 0)
+                PREF_LATEST_TITLE -> latestTitle.value = prefs.getString(PREF_LATEST_TITLE, "") ?: ""
+                PREF_LATEST_PACKAGE_NAME -> latestPackage.value = prefs.getString(PREF_LATEST_PACKAGE_NAME, "-") ?: "-"
+                PREF_LATEST_STATUS -> latestStatus.value = prefs.getString(PREF_LATEST_STATUS, "-") ?: "-"
+                PREF_LATEST_ATTEMPT_TIME -> latestAttemptTime.longValue = prefs.getLong(PREF_LATEST_ATTEMPT_TIME, 0L)
+                PREF_LAST_SUCCESS_TIME -> lastSuccessTime.longValue = prefs.getLong(PREF_LAST_SUCCESS_TIME, 0L)
+                PREF_FAIL_COUNT -> failCount.intValue = prefs.getInt(PREF_FAIL_COUNT, 0)
             }
         }
     }

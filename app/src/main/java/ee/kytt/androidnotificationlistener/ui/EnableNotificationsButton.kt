@@ -26,6 +26,8 @@ import androidx.compose.ui.Modifier
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
+import ee.kytt.androidnotificationlistener.Constants.SETTINGS_INTENT
+import ee.kytt.androidnotificationlistener.Constants.SETTINGS_URI
 
 @Composable
 fun EnableNotificationsButton(
@@ -56,7 +58,7 @@ fun EnableNotificationsButton(
             }
         }
         context.contentResolver.registerContentObserver(
-            Settings.Secure.getUriFor("enabled_notification_listeners"),
+            Settings.Secure.getUriFor(SETTINGS_URI),
             false,
             observer
         )
@@ -67,8 +69,7 @@ fun EnableNotificationsButton(
 
     Button(
         onClick = {
-            val intent = Intent("android.settings.ACTION_NOTIFICATION_LISTENER_SETTINGS")
-            context.startActivity(intent)
+            context.startActivity(Intent(SETTINGS_INTENT))
         },
         modifier = modifier.fillMaxWidth()
     ) {
@@ -94,6 +95,6 @@ fun EnableNotificationsButton(
 
 fun isNotificationListenerEnabled(context: Context): Boolean {
     val pkgName = context.packageName
-    val flat = Settings.Secure.getString(context.contentResolver, "enabled_notification_listeners")
+    val flat = Settings.Secure.getString(context.contentResolver, SETTINGS_URI)
     return flat?.split(":")?.any { it.contains(pkgName) } == true
 }

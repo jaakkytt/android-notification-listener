@@ -20,14 +20,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.core.content.edit
+import ee.kytt.androidnotificationlistener.Constants.PREFS_NAME
+import ee.kytt.androidnotificationlistener.Constants.PREF_PACKAGE_PATTERN
 
 @Composable
 fun MonitorPatternForm(
     context: Context,
     modifier: Modifier
 ) {
-    val prefs = context.getSharedPreferences("app_prefs", ComponentActivity.MODE_PRIVATE)
-    val savedPattern = remember { mutableStateOf(prefs.getString("package_pattern", "") ?: "") }
+    val prefs = context.getSharedPreferences(PREFS_NAME, ComponentActivity.MODE_PRIVATE)
+    val savedPattern = remember { mutableStateOf(prefs.getString(PREF_PACKAGE_PATTERN, "") ?: "") }
     var patternText by remember { mutableStateOf(TextFieldValue(savedPattern.value)) }
 
     OutlinedTextField(
@@ -53,7 +55,7 @@ fun MonitorPatternForm(
         Button(
             onClick = {
                 val newPattern = patternText.text
-                prefs.edit() { putString("package_pattern", patternText.text) }
+                prefs.edit() { putString(PREF_PACKAGE_PATTERN, patternText.text) }
                 savedPattern.value = newPattern
                 Toast.makeText(context, "Pattern saved", Toast.LENGTH_SHORT).show()
             }
