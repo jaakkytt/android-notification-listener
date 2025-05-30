@@ -4,7 +4,7 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
-import ee.kytt.androidnotificationlistener.dto.Notification
+import ee.kytt.androidnotificationlistener.data.Notification
 
 @Database(entities = [Notification::class], version = 1)
 abstract class NotificationDatabase : RoomDatabase() {

@@ -4,7 +4,7 @@ import android.content.Context
 import android.service.notification.NotificationListenerService
 import android.service.notification.StatusBarNotification
 import android.util.Log
-import ee.kytt.androidnotificationlistener.dto.Notification
+import ee.kytt.androidnotificationlistener.data.Notification
 import ee.kytt.androidnotificationlistener.persistence.NotificationDatabase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers

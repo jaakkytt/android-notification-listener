@@ -1,4 +1,4 @@
-package ee.kytt.androidnotificationlistener.dto
+package ee.kytt.androidnotificationlistener.data
 
 import okhttp3.Response
 

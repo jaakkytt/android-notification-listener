@@ -1,4 +1,4 @@
-package ee.kytt.androidnotificationlistener.dto
+package ee.kytt.androidnotificationlistener.data
 
 import java.security.MessageDigest
 import android.app.Notification.EXTRA_BIG_TEXT

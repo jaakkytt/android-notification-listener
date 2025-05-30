@@ -1,8 +1,8 @@
 package ee.kytt.androidnotificationlistener.service
 
 import android.util.Log
-import ee.kytt.androidnotificationlistener.dto.Notification
-import ee.kytt.androidnotificationlistener.dto.SyncResult
+import ee.kytt.androidnotificationlistener.data.Notification
+import ee.kytt.androidnotificationlistener.data.SyncResult
 import kotlinx.serialization.json.Json
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.RequestBody.Companion.toRequestBody

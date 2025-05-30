@@ -4,7 +4,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import ee.kytt.androidnotificationlistener.dto.Notification
+import ee.kytt.androidnotificationlistener.data.Notification
 
 @Dao
 interface NotificationDao {
