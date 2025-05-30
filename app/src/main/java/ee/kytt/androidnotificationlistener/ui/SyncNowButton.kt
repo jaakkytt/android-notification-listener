@@ -25,7 +25,7 @@ fun SyncNowButton(
         },
         modifier = modifier
     ) {
-        Text("Sync Failed Notifications Now")
+        Text("Trigger Sync Manually")
     }
 }
 

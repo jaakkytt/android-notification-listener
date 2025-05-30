@@ -2,11 +2,18 @@ package ee.kytt.androidnotificationlistener.ui
 
 import android.content.Context
 import android.widget.Toast
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.Button
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Switch
+import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.core.content.edit
 import androidx.work.Constraints
@@ -28,18 +35,26 @@ fun BackgroundSyncButton(
         onClick = {
             toggleBackgroundSync(context)
             syncEnabledState.value = !syncEnabledState.value
-
-            val message = if (syncEnabledState.value) {
-                "Background sync enabled"
-            } else {
-                "Background sync disabled"
-            }
-            Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
         },
         modifier = modifier
     ) {
-        val label = if (syncEnabledState.value) "Disable Background Sync" else "Enable Background Sync"
-        Text(label)
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Text(
+                text = if (syncEnabledState.value) "Background Sync: Enabled" else "Background Sync: Disabled",
+                modifier = Modifier.align(Alignment.CenterVertically)
+            )
+            Switch(
+                checked = syncEnabledState.value,
+                onCheckedChange = null,
+                colors = SwitchDefaults.colors(
+                    checkedThumbColor = MaterialTheme.colorScheme.primary,
+                    checkedTrackColor = MaterialTheme.colorScheme.primaryContainer
+                )
+            )
+        }
     }
 }
 

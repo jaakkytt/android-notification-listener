@@ -75,7 +75,7 @@ fun NotificationAccessUI(modifier: Modifier = Modifier) {
 
         Spacer(modifier = Modifier.height(32.dp))
 
-        Text("Latest Notification", style = MaterialTheme.typography.titleMedium)
+        Text("Sync Status", style = MaterialTheme.typography.titleMedium)
 
         Spacer(modifier = Modifier.height(4.dp))
 

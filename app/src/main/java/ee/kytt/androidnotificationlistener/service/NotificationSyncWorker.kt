@@ -28,6 +28,7 @@ class NotificationSyncWorker(
         val db = NotificationDatabase.getDatabase(applicationContext)
         val dao = db.notificationDao()
         val failedNotifications = dao.getAll()
+        var failedCount = failedNotifications.size
 
         for (notification in failedNotifications) {
             val response = callbackService.sendSync(url, notification)
@@ -35,8 +36,25 @@ class NotificationSyncWorker(
             if (response.success) {
                 dao.delete(notification.id)
                 Log.d("NotificationSyncWorker", "Resent and deleted notification: ${notification.id}")
+                prefs.edit().apply {
+                    putString("latestTitle", notification.description())
+                    putString("latestPackageName", notification.packageName)
+                    putString("latestStatus", response.status)
+                    putLong("latestAttemptTime", System.currentTimeMillis())
+                    putLong("lastSuccessTime", System.currentTimeMillis())
+                    apply()
+                }
+                failedCount -= 1
             } else {
                 Log.w("NotificationSyncWorker", "Failed to resend notification: ${notification.id}, status: ${response.status}")
+
+                prefs.edit().apply {
+                    putInt("failCount", failedCount)
+                    putString("latestStatus", response.status)
+                    putLong("latestAttemptTime", System.currentTimeMillis())
+                    apply()
+                }
+
                 if (runAttemptCount < maxAttempts) {
                     return Result.retry()
                 }
