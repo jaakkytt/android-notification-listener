@@ -1,3 +1,39 @@
 <resources>
     <string name="app_name">Notification Listener</string>
+
+    <!-- Background sync -->
+    <string name="background_sync_enabled">Background sync: enabled</string>
+    <string name="background_sync_disabled">Background sync: disabled</string>
+    <string name="sync_status">Sync status</string>
+
+    <!-- URLs -->
+    <string name="save_url">Save URL</string>
+    <string name="url_saved">URL saved</string>
+    <string name="callback_url">Callback URL</string>
+    <string name="callback_url_not_set">Callback URL not set</string>
+
+    <!-- Notification access -->
+    <string name="notification_access_enabled">Notification access: enabled</string>
+    <string name="notification_access_disabled">Notification access: disabled</string>
+
+    <!-- App-monitoring modes -->
+    <string name="monitor_matching_apps">Monitor matching applications</string>
+    <string name="monitor_all_apps">Monitor all applications</string>
+
+    <!-- Patterns -->
+    <string name="pattern_saved">Pattern saved</string>
+    <string name="save_pattern">Save pattern</string>
+
+    <!-- Manual sync -->
+    <string name="trigger_sync_manually">Trigger sync manually</string>
+    <string name="sync_started">Sync started</string>
+
+    <!-- Status info -->
+    <string name="last_synced">Last synced</string>
+    <string name="unsynced_entries">Unsynced entries</string>
+    <string name="latest_attempt">Latest attempt</string>
+
+    <!-- Date-time format -->
+    <string name="datetime_format">yyyy-MM-dd HH:mm</string>
+    <string name="datetime_never">never</string>
 </resources>

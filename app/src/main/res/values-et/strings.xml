@@ -1,0 +1,39 @@
+<resources>
+    <string name="app_name">Teavituse kuulaja</string>
+
+    <!-- Background sync -->
+    <string name="background_sync_enabled">Taustsünk: sees</string>
+    <string name="background_sync_disabled">Taustsünk: väljas</string>
+    <string name="sync_status">Sünki olek</string>
+
+    <!-- URLs -->
+    <string name="save_url">Salvesta URL</string>
+    <string name="url_saved">URL salvestatud</string>
+    <string name="callback_url">Tagasikutse URL</string>
+    <string name="callback_url_not_set">Tagasikutse URL puudub</string>
+
+    <!-- Notification access -->
+    <string name="notification_access_enabled">Teavituste ligipääs: sees</string>
+    <string name="notification_access_disabled">Teavituste ligipääs: väljas</string>
+
+    <!-- App-monitoring modes -->
+    <string name="monitor_matching_apps">Jälgi sobivaid rakendusi</string>
+    <string name="monitor_all_apps">Jälgi kõiki rakendusi</string>
+
+    <!-- Patterns -->
+    <string name="pattern_saved">Muster salvestatud</string>
+    <string name="save_pattern">Salvesta muster</string>
+
+    <!-- Manual sync -->
+    <string name="trigger_sync_manually">Käivita sünk käsitsi</string>
+    <string name="sync_started">Sünk alustatud</string>
+
+    <!-- Status info -->
+    <string name="last_synced">Viimane sünk</string>
+    <string name="unsynced_entries">Sünkimata kirjed</string>
+    <string name="latest_attempt">Viimane katse</string>
+
+    <!-- Date-time format -->
+    <string name="datetime_format">yyyy-MM-dd HH:mm</string>
+    <string name="datetime_never">pole</string>
+</resources>

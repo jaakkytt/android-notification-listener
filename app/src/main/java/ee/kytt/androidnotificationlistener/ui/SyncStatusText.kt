@@ -12,6 +12,7 @@ import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import ee.kytt.androidnotificationlistener.Constants.PREFS_NAME
 import ee.kytt.androidnotificationlistener.Constants.PREF_FAIL_COUNT
 import ee.kytt.androidnotificationlistener.Constants.PREF_LAST_SUCCESS_TIME
@@ -19,6 +20,7 @@ import ee.kytt.androidnotificationlistener.Constants.PREF_LATEST_ATTEMPT_TIME
 import ee.kytt.androidnotificationlistener.Constants.PREF_LATEST_PACKAGE_NAME
 import ee.kytt.androidnotificationlistener.Constants.PREF_LATEST_STATUS
 import ee.kytt.androidnotificationlistener.Constants.PREF_LATEST_TITLE
+import ee.kytt.androidnotificationlistener.R
 import java.time.Instant
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
@@ -49,6 +51,12 @@ fun SyncStatusText(
         }
     }
 
+    var labelLastSynced = stringResource(R.string.last_synced)
+    var labelUnsyncedEntries = stringResource(R.string.unsynced_entries)
+    var labelLatestAttempt = stringResource(R.string.latest_attempt)
+    var labelDatetimeFormat = stringResource(R.string.datetime_format)
+    var labelDatetimeNever = stringResource(R.string.datetime_never)
+
     DisposableEffect(Unit) {
         prefs.registerOnSharedPreferenceChangeListener(listener)
         onDispose {
@@ -69,20 +77,20 @@ fun SyncStatusText(
     }
 
     if (isSuccess) {
-        StatusText("Last synced: ${formatTimestamp(lastSuccessTime.longValue)}")
+        StatusText("${labelLastSynced}: ${formatTimestamp(lastSuccessTime.longValue, labelDatetimeNever, labelDatetimeFormat)}")
         StatusText(latestPackage.value)
         StatusText(latestTitle.value)
     } else {
-        StatusText("Unsynced entries: ${failCount.intValue}")
-        StatusText("Latest attempt: ${formatTimestamp(latestAttemptTime.longValue)}")
-        StatusText("Last synced: ${formatTimestamp(lastSuccessTime.longValue)}")
+        StatusText("${labelUnsyncedEntries}: ${failCount.intValue}")
+        StatusText("${labelLatestAttempt}: ${formatTimestamp(latestAttemptTime.longValue, labelDatetimeNever, labelDatetimeFormat)}")
+        StatusText("${labelLastSynced}: ${formatTimestamp(lastSuccessTime.longValue, labelDatetimeNever, labelDatetimeFormat)}")
     }
 }
 
-fun formatTimestamp(millis: Long): String {
+fun formatTimestamp(millis: Long, labelNever: String, datetimeFormat: String): String {
     if (millis <= 0) {
-        return "never"
+        return labelNever
     }
-    val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm").withZone(ZoneId.systemDefault())
+    val formatter = DateTimeFormatter.ofPattern(datetimeFormat).withZone(ZoneId.systemDefault())
     return formatter.format(Instant.ofEpochMilli(millis))
 }

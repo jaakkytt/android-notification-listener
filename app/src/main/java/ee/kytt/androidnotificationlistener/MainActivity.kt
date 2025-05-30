@@ -18,6 +18,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ee.kytt.androidnotificationlistener.ui.BackgroundSyncButton
@@ -75,7 +76,7 @@ fun NotificationAccessUI(modifier: Modifier = Modifier) {
 
         Spacer(modifier = Modifier.height(32.dp))
 
-        Text("Sync Status", style = MaterialTheme.typography.titleMedium)
+        Text(stringResource(R.string.sync_status), style = MaterialTheme.typography.titleMedium)
 
         Spacer(modifier = Modifier.height(4.dp))
 

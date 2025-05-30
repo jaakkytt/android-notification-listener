@@ -1,9 +1,9 @@
 package ee.kytt.androidnotificationlistener.service
 
 import android.content.Context
+import android.util.Log
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
-import android.util.Log
 import ee.kytt.androidnotificationlistener.Constants.PREFS_NAME
 import ee.kytt.androidnotificationlistener.Constants.PREF_CALLBACK_URL
 import ee.kytt.androidnotificationlistener.Constants.PREF_FAIL_COUNT

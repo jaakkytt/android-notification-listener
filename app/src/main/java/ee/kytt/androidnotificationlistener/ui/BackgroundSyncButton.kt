@@ -14,15 +14,17 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.core.content.edit
 import androidx.work.Constraints
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.NetworkType
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
+import ee.kytt.androidnotificationlistener.Constants.BACKGROUND_WORK_NAME
 import ee.kytt.androidnotificationlistener.Constants.PREFS_NAME
 import ee.kytt.androidnotificationlistener.Constants.PREF_SYNC_ENABLED
-import ee.kytt.androidnotificationlistener.Constants.BACKGROUND_WORK_NAME
+import ee.kytt.androidnotificationlistener.R
 import ee.kytt.androidnotificationlistener.service.NotificationSyncWorker
 import java.util.concurrent.TimeUnit.MINUTES
 
@@ -32,6 +34,9 @@ fun BackgroundSyncButton(
     modifier: Modifier
 ) {
     val syncEnabledState = remember { mutableStateOf(isSyncEnabled(context)) }
+
+    var labelBackgroundSyncEnabled = stringResource(R.string.background_sync_enabled)
+    var labelBackgroundSyncDisabled = stringResource(R.string.background_sync_disabled)
 
     Button(
         onClick = {
@@ -45,7 +50,7 @@ fun BackgroundSyncButton(
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Text(
-                text = if (syncEnabledState.value) "Background Sync: Enabled" else "Background Sync: Disabled",
+                text = if (syncEnabledState.value) labelBackgroundSyncEnabled else labelBackgroundSyncDisabled,
                 modifier = Modifier.align(Alignment.CenterVertically)
             )
             Switch(

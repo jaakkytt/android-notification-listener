@@ -1,6 +1,5 @@
 package ee.kytt.androidnotificationlistener.data
 
-import java.security.MessageDigest
 import android.app.Notification.EXTRA_BIG_TEXT
 import android.app.Notification.EXTRA_SUB_TEXT
 import android.app.Notification.EXTRA_TEXT
@@ -8,6 +7,7 @@ import android.app.Notification.EXTRA_TITLE
 import android.service.notification.StatusBarNotification
 import androidx.room.Entity
 import kotlinx.serialization.Serializable
+import java.security.MessageDigest
 
 @OptIn(kotlinx.serialization.InternalSerializationApi::class)
 @Serializable

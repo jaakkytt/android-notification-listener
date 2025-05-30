@@ -23,11 +23,13 @@ import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import ee.kytt.androidnotificationlistener.Constants.SETTINGS_INTENT
 import ee.kytt.androidnotificationlistener.Constants.SETTINGS_URI
+import ee.kytt.androidnotificationlistener.R
 
 @Composable
 fun EnableNotificationsButton(
@@ -37,6 +39,9 @@ fun EnableNotificationsButton(
     var enabled by remember { mutableStateOf(isNotificationListenerEnabled(context)) }
     val lifecycleOwner = LocalLifecycleOwner.current
     val currentContext by rememberUpdatedState(context)
+
+    var labelNotificationAccessEnabled = stringResource(R.string.notification_access_enabled)
+    var labelNotificationAccessDisabled = stringResource(R.string.notification_access_disabled)
 
     DisposableEffect(lifecycleOwner) {
         val observer = LifecycleEventObserver { _, event ->
@@ -78,7 +83,7 @@ fun EnableNotificationsButton(
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Text(
-                text = if (enabled) "Notification Access: Enabled" else "Notification Access: Disabled",
+                text = if (enabled) labelNotificationAccessEnabled else labelNotificationAccessDisabled,
                 modifier = Modifier.align(Alignment.CenterVertically)
             )
             Switch(

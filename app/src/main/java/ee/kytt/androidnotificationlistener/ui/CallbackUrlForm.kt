@@ -17,11 +17,13 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.core.content.edit
 import ee.kytt.androidnotificationlistener.Constants.PREFS_NAME
 import ee.kytt.androidnotificationlistener.Constants.PREF_CALLBACK_URL
+import ee.kytt.androidnotificationlistener.R
 
 @Composable
 fun CallbackUrlForm(
@@ -32,14 +34,19 @@ fun CallbackUrlForm(
     val savedUrl = remember { mutableStateOf(prefs.getString(PREF_CALLBACK_URL, "") ?: "") }
     var urlText by remember { mutableStateOf(TextFieldValue(savedUrl.value)) }
 
+    var labelCallbackUrl = stringResource(R.string.callback_url)
+    var labelCallbackUrlNotSet = stringResource(R.string.callback_url_not_set)
+    var labelUrlSaved = stringResource(R.string.url_saved)
+    var labelSaveUrl = stringResource(R.string.save_url)
+
     OutlinedTextField(
         value = urlText,
         onValueChange = { urlText = it },
         label = {
             if (savedUrl.value.isNotEmpty()) {
-                Text("Callback URL")
+                Text(labelCallbackUrl)
             } else {
-                Text("Callback URL not set")
+                Text(labelCallbackUrlNotSet)
             }
         },
         singleLine = true,
@@ -57,10 +64,10 @@ fun CallbackUrlForm(
                 val newUrl = urlText.text
                 prefs.edit() { putString(PREF_CALLBACK_URL, urlText.text) }
                 savedUrl.value = newUrl
-                Toast.makeText(context, "Url saved", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, labelUrlSaved, Toast.LENGTH_SHORT).show()
             }
         ) {
-            Text("Save URL")
+            Text(labelSaveUrl)
         }
     }
 }
