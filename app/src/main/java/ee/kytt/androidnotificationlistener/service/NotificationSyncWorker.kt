@@ -12,6 +12,7 @@ import ee.kytt.androidnotificationlistener.Constants.PREF_LAST_SUCCESS_TIME
 import ee.kytt.androidnotificationlistener.Constants.PREF_LATEST_ATTEMPT_TIME
 import ee.kytt.androidnotificationlistener.Constants.PREF_LATEST_PACKAGE_NAME
 import ee.kytt.androidnotificationlistener.Constants.PREF_LATEST_STATUS
+import ee.kytt.androidnotificationlistener.Constants.PREF_LATEST_SYNC_ERROR
 import ee.kytt.androidnotificationlistener.Constants.PREF_LATEST_TITLE
 import ee.kytt.androidnotificationlistener.persistence.NotificationDatabase
 
@@ -50,6 +51,7 @@ class NotificationSyncWorker(
                     putString(PREF_LATEST_TITLE, notification.description())
                     putString(PREF_LATEST_PACKAGE_NAME, notification.packageName)
                     putString(PREF_LATEST_STATUS, response.status)
+                    putString(PREF_LATEST_SYNC_ERROR, response.userMessage)
                     putLong(PREF_LATEST_ATTEMPT_TIME, System.currentTimeMillis())
                     putLong(PREF_LAST_SUCCESS_TIME, System.currentTimeMillis())
                     apply()
@@ -61,6 +63,7 @@ class NotificationSyncWorker(
                 prefs.edit().apply {
                     putInt(PREF_FAIL_COUNT, failedCount)
                     putString(PREF_LATEST_STATUS, response.status)
+                    putString(PREF_LATEST_SYNC_ERROR, response.userMessage)
                     putLong(PREF_LATEST_ATTEMPT_TIME, System.currentTimeMillis())
                     apply()
                 }

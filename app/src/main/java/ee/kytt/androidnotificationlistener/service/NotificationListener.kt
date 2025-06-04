@@ -12,9 +12,12 @@ import ee.kytt.androidnotificationlistener.Constants.PREF_LAST_SUCCESS_TIME
 import ee.kytt.androidnotificationlistener.Constants.PREF_LATEST_ATTEMPT_TIME
 import ee.kytt.androidnotificationlistener.Constants.PREF_LATEST_PACKAGE_NAME
 import ee.kytt.androidnotificationlistener.Constants.PREF_LATEST_STATUS
+import ee.kytt.androidnotificationlistener.Constants.PREF_LATEST_SYNC_ERROR
 import ee.kytt.androidnotificationlistener.Constants.PREF_LATEST_TITLE
 import ee.kytt.androidnotificationlistener.Constants.PREF_PACKAGE_PATTERN
+import ee.kytt.androidnotificationlistener.R
 import ee.kytt.androidnotificationlistener.data.Notification
+import ee.kytt.androidnotificationlistener.data.SyncResult
 import ee.kytt.androidnotificationlistener.persistence.NotificationDatabase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -32,6 +35,7 @@ class NotificationListener : NotificationListenerService() {
         val url = prefs.getString(PREF_CALLBACK_URL, null)
         val packagePattern = prefs.getString(PREF_PACKAGE_PATTERN, null) ?: ""
         val token = prefs.getString(PREF_CALLBACK_TOKEN, null) ?: ""
+        val notSetText = context.getString(R.string.callback_url_not_set)
 
         Log.d("NotificationListener", Json.Default.encodeToString(notification))
 
@@ -42,18 +46,19 @@ class NotificationListener : NotificationListenerService() {
 
         if (url.isNullOrEmpty()) {
             Log.w("NotificationListener", "No callback URL set")
-            saveFailedNotification(notification, context, "No callback URL")
+            saveFailedNotification(notification, context, SyncResult(false, "Failed", notSetText))
             return
         }
 
         callbackService.sendAsync(url, token, notification) { result ->
             if (!result.success) {
-                saveFailedNotification(notification, context, result.status)
+                saveFailedNotification(notification, context, result)
             } else {
                 prefs.edit().apply {
                     putString(PREF_LATEST_TITLE, notification.description())
                     putString(PREF_LATEST_PACKAGE_NAME, notification.packageName)
                     putString(PREF_LATEST_STATUS, result.status)
+                    putString(PREF_LATEST_SYNC_ERROR, result.userMessage)
                     putLong(PREF_LATEST_ATTEMPT_TIME, System.currentTimeMillis())
                     putLong(PREF_LAST_SUCCESS_TIME, System.currentTimeMillis())
                     apply()
@@ -62,7 +67,7 @@ class NotificationListener : NotificationListenerService() {
         }
     }
 
-    private fun saveFailedNotification(notification: Notification, context: Context, status: String) {
+    private fun saveFailedNotification(notification: Notification, context: Context, result: SyncResult) {
         CoroutineScope(Dispatchers.IO).launch {
             val db = NotificationDatabase.Companion.getDatabase(context)
             db.notificationDao().insert(notification)
@@ -70,7 +75,8 @@ class NotificationListener : NotificationListenerService() {
             Log.d("NotificationListener", "Saved failed notification to local DB, unsynced count: $failed")
             context.getSharedPreferences(PREFS_NAME, MODE_PRIVATE).edit().apply {
                 putInt(PREF_FAIL_COUNT, failed)
-                putString(PREF_LATEST_STATUS, status)
+                putString(PREF_LATEST_STATUS, result.status)
+                putString(PREF_LATEST_SYNC_ERROR, result.userMessage)
                 putLong(PREF_LATEST_ATTEMPT_TIME, System.currentTimeMillis())
                 apply()
             }

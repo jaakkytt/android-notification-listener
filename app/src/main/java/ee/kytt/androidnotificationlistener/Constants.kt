@@ -10,6 +10,7 @@ object Constants {
     const val PREF_LATEST_STATUS = "latestStatus"
     const val PREF_LATEST_ATTEMPT_TIME = "latestAttemptTime"
     const val PREF_LAST_SUCCESS_TIME = "lastSuccessTime"
+    const val PREF_LATEST_SYNC_ERROR = "latest_error"
     const val PREF_FAIL_COUNT = "failCount"
     const val PREF_SYNC_ENABLED = "sync_enabled"
     const val BACKGROUND_WORK_NAME = "notification_sync"
