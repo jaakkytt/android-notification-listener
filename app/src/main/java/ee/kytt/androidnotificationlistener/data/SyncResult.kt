@@ -11,13 +11,13 @@ data class SyncResult(
     constructor(response: Response) : this(
         success = response.isSuccessful,
         status = if (response.isSuccessful) "Success" else "Failed: ${response.message}",
-        userMessage = if (response.isSuccessful) "" else "[Server, ${response.code}]: <${response.message}>"
+        userMessage = if (response.isSuccessful) "" else "Server [${response.code}]: ${response.message}"
     )
 
     constructor(e: Exception) : this(
         success = false,
         status = "Failed: ${e.message}",
-        userMessage = "[App]: <${e.message}>"
+        userMessage = "App: ${e.message}"
     )
 
 }

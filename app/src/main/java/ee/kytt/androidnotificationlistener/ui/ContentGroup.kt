@@ -13,7 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun SettingsGroup(
+fun ContentGroup(
     title: String,
     content: @Composable ColumnScope.() -> Unit
 ) {

@@ -60,7 +60,7 @@ fun SettingsScreen(
 
         Spacer(modifier = Modifier.height(32.dp))
 
-        SettingsGroup(title = stringResource(R.string.notifications)) {
+        ContentGroup(title = stringResource(R.string.notifications)) {
             EnableNotificationsButton(context)
 
             HorizontalDivider(modifier = divModifier)
@@ -68,7 +68,7 @@ fun SettingsScreen(
             AutoRevokeStatusButton(context)
         }
 
-        SettingsGroup(title = stringResource(R.string.filter)) {
+        ContentGroup(title = stringResource(R.string.filter)) {
             TextField(
                 context = context,
                 prefKey = PREF_PACKAGE_PATTERN,
@@ -78,7 +78,7 @@ fun SettingsScreen(
             )
         }
 
-        SettingsGroup(title = stringResource(R.string.remote_server)) {
+        ContentGroup(title = stringResource(R.string.remote_server)) {
             BackgroundSyncButton(context)
 
             HorizontalDivider(modifier = divModifier)
