@@ -23,6 +23,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import ee.kytt.androidnotificationlistener.Constants.PREF_CALLBACK_TOKEN
+import ee.kytt.androidnotificationlistener.Constants.PREF_CALLBACK_URL
+import ee.kytt.androidnotificationlistener.Constants.PREF_PACKAGE_PATTERN
 import ee.kytt.androidnotificationlistener.R
 
 @Composable
@@ -66,7 +69,13 @@ fun SettingsScreen(
         }
 
         SettingsGroup(title = stringResource(R.string.filter)) {
-            MonitorPatternField(context, Modifier)
+            TextField(
+                context = context,
+                prefKey = PREF_PACKAGE_PATTERN,
+                labelSet = stringResource(R.string.monitor_matching_apps),
+                labelNotSet = stringResource(R.string.monitor_all_apps),
+                description = stringResource(R.string.monitor_matching_apps_description)
+            )
         }
 
         SettingsGroup(title = stringResource(R.string.remote_server)) {
@@ -74,7 +83,23 @@ fun SettingsScreen(
 
             HorizontalDivider(modifier = divModifier)
 
-            CallbackUrlField(context, Modifier)
+            TextField(
+                context = context,
+                prefKey = PREF_CALLBACK_URL,
+                labelSet = stringResource(R.string.callback_url),
+                labelNotSet = stringResource(R.string.callback_url_not_set),
+                description = stringResource(R.string.callback_url_description)
+            )
+
+            HorizontalDivider(modifier = divModifier)
+
+            TextField(
+                context = context,
+                prefKey = PREF_CALLBACK_TOKEN,
+                labelSet = stringResource(R.string.callback_token_set),
+                labelNotSet = stringResource(R.string.callback_token_not_set),
+                description = stringResource(R.string.callback_token_description)
+            )
         }
     }
 }

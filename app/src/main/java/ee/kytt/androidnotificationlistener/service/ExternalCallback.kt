@@ -19,13 +19,14 @@ class ExternalCallback {
 
     fun sendAsync(
         url: String,
+        token: String,
         notification: Notification,
         callback: (SyncResult) -> Unit
     ) {
         val request: Request
 
         try {
-            request = createRequest(url, notification)
+            request = createRequest(url, token, notification)
         } catch (e: Exception) {
             Log.w("ExternalCallback", "Failed to create request", e)
             callback(SyncResult(e))
@@ -47,9 +48,9 @@ class ExternalCallback {
         })
     }
 
-    fun sendSync(url: String, notification: Notification): SyncResult {
+    fun sendSync(url: String, token: String, notification: Notification): SyncResult {
         try {
-            val request = createRequest(url, notification)
+            val request = createRequest(url, token, notification)
             client.newCall(request).execute().use { response ->
                 Log.d("ExternalCallback", "Response: $response")
                 return SyncResult(response)
@@ -60,15 +61,20 @@ class ExternalCallback {
         }
     }
 
-    private fun createRequest(url: String, notification: Notification): Request {
+    private fun createRequest(url: String, token: String, notification: Notification): Request {
         val json = Json.encodeToString(notification)
         val mediaType = "application/json; charset=utf-8".toMediaType()
         val body = json.toRequestBody(mediaType)
 
-        return Request.Builder()
+        val builder = Request.Builder()
             .url(url)
             .post(body)
-            .build()
+
+        if (token.isNotEmpty()) {
+            builder.addHeader("Authorization", "Bearer $token")
+        }
+
+        return builder.build()
     }
 
 }

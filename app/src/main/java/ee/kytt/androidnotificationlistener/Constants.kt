@@ -4,6 +4,7 @@ object Constants {
     const val PREFS_NAME = "app_prefs"
     const val PREF_CALLBACK_URL = "callback_url"
     const val PREF_PACKAGE_PATTERN = "package_pattern"
+    const val PREF_CALLBACK_TOKEN = "callback_token"
     const val PREF_LATEST_TITLE = "latestTitle"
     const val PREF_LATEST_PACKAGE_NAME = "latestPackageName"
     const val PREF_LATEST_STATUS = "latestStatus"

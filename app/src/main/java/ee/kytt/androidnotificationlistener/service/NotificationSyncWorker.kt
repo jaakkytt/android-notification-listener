@@ -5,6 +5,7 @@ import android.util.Log
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import ee.kytt.androidnotificationlistener.Constants.PREFS_NAME
+import ee.kytt.androidnotificationlistener.Constants.PREF_CALLBACK_TOKEN
 import ee.kytt.androidnotificationlistener.Constants.PREF_CALLBACK_URL
 import ee.kytt.androidnotificationlistener.Constants.PREF_FAIL_COUNT
 import ee.kytt.androidnotificationlistener.Constants.PREF_LAST_SUCCESS_TIME
@@ -25,6 +26,7 @@ class NotificationSyncWorker(
     override suspend fun doWork(): Result {
         val prefs = applicationContext.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
         val url = prefs.getString(PREF_CALLBACK_URL, null)
+        val token = prefs.getString(PREF_CALLBACK_TOKEN, null) ?: ""
 
         if (url.isNullOrEmpty()) {
             Log.w("NotificationSyncWorker", "No callback URL set")
@@ -39,7 +41,7 @@ class NotificationSyncWorker(
         var failedCount = failedNotifications.size
 
         for (notification in failedNotifications) {
-            val response = callbackService.sendSync(url, notification)
+            val response = callbackService.sendSync(url, token, notification)
 
             if (response.success) {
                 dao.delete(notification.id)

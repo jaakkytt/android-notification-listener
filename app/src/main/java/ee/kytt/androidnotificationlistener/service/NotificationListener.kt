@@ -5,6 +5,7 @@ import android.service.notification.NotificationListenerService
 import android.service.notification.StatusBarNotification
 import android.util.Log
 import ee.kytt.androidnotificationlistener.Constants.PREFS_NAME
+import ee.kytt.androidnotificationlistener.Constants.PREF_CALLBACK_TOKEN
 import ee.kytt.androidnotificationlistener.Constants.PREF_CALLBACK_URL
 import ee.kytt.androidnotificationlistener.Constants.PREF_FAIL_COUNT
 import ee.kytt.androidnotificationlistener.Constants.PREF_LAST_SUCCESS_TIME
@@ -30,6 +31,7 @@ class NotificationListener : NotificationListenerService() {
         val prefs = context.getSharedPreferences(PREFS_NAME, MODE_PRIVATE)
         val url = prefs.getString(PREF_CALLBACK_URL, null)
         val packagePattern = prefs.getString(PREF_PACKAGE_PATTERN, null) ?: ""
+        val token = prefs.getString(PREF_CALLBACK_TOKEN, null) ?: ""
 
         Log.d("NotificationListener", Json.Default.encodeToString(notification))
 
@@ -44,7 +46,7 @@ class NotificationListener : NotificationListenerService() {
             return
         }
 
-        callbackService.sendAsync(url, notification) { result ->
+        callbackService.sendAsync(url, token, notification) { result ->
             if (!result.success) {
                 saveFailedNotification(notification, context, result.status)
             } else {
