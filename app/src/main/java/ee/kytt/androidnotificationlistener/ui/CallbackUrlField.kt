@@ -1,14 +1,8 @@
 package ee.kytt.androidnotificationlistener.ui
 
 import android.content.Context
-import android.widget.Toast
 import androidx.activity.ComponentActivity
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.material3.Button
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -19,14 +13,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.TextFieldValue
-import androidx.compose.ui.unit.dp
 import androidx.core.content.edit
 import ee.kytt.androidnotificationlistener.Constants.PREFS_NAME
 import ee.kytt.androidnotificationlistener.Constants.PREF_CALLBACK_URL
 import ee.kytt.androidnotificationlistener.R
 
 @Composable
-fun CallbackUrlForm(
+fun CallbackUrlField(
     context: Context,
     modifier: Modifier
 ) {
@@ -34,40 +27,22 @@ fun CallbackUrlForm(
     val savedUrl = remember { mutableStateOf(prefs.getString(PREF_CALLBACK_URL, "") ?: "") }
     var urlText by remember { mutableStateOf(TextFieldValue(savedUrl.value)) }
 
-    var labelCallbackUrl = stringResource(R.string.callback_url)
-    var labelCallbackUrlNotSet = stringResource(R.string.callback_url_not_set)
-    var labelUrlSaved = stringResource(R.string.url_saved)
-    var labelSaveUrl = stringResource(R.string.save_url)
+    var urlSetLabel = stringResource(R.string.callback_url)
+    var notSetLabel = stringResource(R.string.callback_url_not_set)
 
     OutlinedTextField(
         value = urlText,
-        onValueChange = { urlText = it },
+        onValueChange = {
+            urlText = it
+            prefs.edit() { putString(PREF_CALLBACK_URL, urlText.text) }
+            savedUrl.value = urlText.text
+        },
         label = {
-            if (savedUrl.value.isNotEmpty()) {
-                Text(labelCallbackUrl)
-            } else {
-                Text(labelCallbackUrlNotSet)
-            }
+            Text(if (savedUrl.value.isNotEmpty()) urlSetLabel else notSetLabel)
         },
         singleLine = true,
         modifier = modifier.fillMaxWidth()
     )
 
-    Spacer(modifier = modifier.height(8.dp))
-
-    Row(
-        modifier = modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.End
-    ) {
-        Button(
-            onClick = {
-                val newUrl = urlText.text
-                prefs.edit() { putString(PREF_CALLBACK_URL, urlText.text) }
-                savedUrl.value = newUrl
-                Toast.makeText(context, labelUrlSaved, Toast.LENGTH_SHORT).show()
-            }
-        ) {
-            Text(labelSaveUrl)
-        }
-    }
+    Description(text = stringResource(R.string.callback_url_description))
 }

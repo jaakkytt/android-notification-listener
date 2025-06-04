@@ -1,39 +1,32 @@
 <resources>
     <string name="app_name">Notification Listener</string>
-
-    <!-- Background sync -->
-    <string name="background_sync_enabled">Background sync: enabled</string>
-    <string name="background_sync_disabled">Background sync: disabled</string>
-    <string name="sync_status">Sync status</string>
-
-    <!-- URLs -->
-    <string name="save_url">Save URL</string>
-    <string name="url_saved">URL saved</string>
-    <string name="callback_url">Callback URL</string>
-    <string name="callback_url_not_set">Callback URL not set</string>
-
-    <!-- Notification access -->
-    <string name="notification_access_enabled">Notification access: enabled</string>
-    <string name="notification_access_disabled">Notification access: disabled</string>
-
-    <!-- App-monitoring modes -->
+    <string name="open_settings">Open Settings</string>
+    <string name="settings">Settings</string>
+    <string name="notifications">Notifications</string>
+    <string name="filter">Filter</string>
+    <string name="remote_server">Remote Server</string>
+    <string name="back">Back</string>
+    <string name="auto_revoke_permissions_title">Remove permissions when unused</string>
+    <string name="auto_revoke_permissions_description">Keep this setting disabled to avoid automatic permission revocation, which may prevent the app from collecting notification data.</string>
+    <string name="background_sync_enable_title">Enable background sync</string>
+    <string name="background_sync_enable_description">Enables background syncing for notifications that couldn’t be delivered due to lost or unstable internet connection.</string>
+    <string name="callback_url">Remote URL</string>
+    <string name="callback_url_not_set">Remote URL not set</string>
+    <string name="callback_url_description">Set the URL where notifications will be sent. Useful for integrating with your own server or processing system.</string>
+    <string name="callback_token_not_set">No token set</string>
+    <string name="callback_token_set">Authorization Token</string>
+    <string name="callback_token_description">Set an optional Bearer token to include in the Authorization header when sending notifications. Useful for securing your remote endpoint.</string>
+    <string name="allow_notification_access">Allow notification access</string>
+    <string name="allow_notification_access_description">Grant notification access so the app can read notifications from other apps. Required for core functionality.</string>
     <string name="monitor_matching_apps">Monitor matching applications</string>
     <string name="monitor_all_apps">Monitor all applications</string>
-
-    <!-- Patterns -->
-    <string name="pattern_saved">Pattern saved</string>
-    <string name="save_pattern">Save pattern</string>
-
-    <!-- Manual sync -->
+    <string name="monitor_matching_apps_description">Only monitor apps whose package names match the provided regular expression. Leave blank to monitor all apps.</string>
     <string name="trigger_sync_manually">Trigger sync manually</string>
+    <string name="sync_status">Sync status</string>
     <string name="sync_started">Sync started</string>
-
-    <!-- Status info -->
     <string name="last_synced">Last synced</string>
     <string name="unsynced_entries">Unsynced entries</string>
     <string name="latest_attempt">Latest attempt</string>
-
-    <!-- Date-time format -->
     <string name="datetime_format">yyyy-MM-dd HH:mm</string>
     <string name="datetime_never">never</string>
 </resources>

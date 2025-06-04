@@ -1,19 +1,9 @@
 package ee.kytt.androidnotificationlistener.ui
 
 import android.content.Context
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.material3.Button
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Switch
-import androidx.compose.material3.SwitchDefaults
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.core.content.edit
 import androidx.work.Constraints
@@ -29,40 +19,18 @@ import ee.kytt.androidnotificationlistener.service.NotificationSyncWorker
 import java.util.concurrent.TimeUnit.MINUTES
 
 @Composable
-fun BackgroundSyncButton(
-    context: Context,
-    modifier: Modifier
-) {
+fun BackgroundSyncButton(context: Context) {
     val syncEnabledState = remember { mutableStateOf(isSyncEnabled(context)) }
 
-    var labelBackgroundSyncEnabled = stringResource(R.string.background_sync_enabled)
-    var labelBackgroundSyncDisabled = stringResource(R.string.background_sync_disabled)
-
-    Button(
+    SettingSwitch(
+        title = stringResource(R.string.background_sync_enable_title),
+        checked = syncEnabledState.value,
+        description = stringResource(R.string.background_sync_enable_description),
         onClick = {
             toggleBackgroundSync(context)
             syncEnabledState.value = !syncEnabledState.value
-        },
-        modifier = modifier
-    ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            Text(
-                text = if (syncEnabledState.value) labelBackgroundSyncEnabled else labelBackgroundSyncDisabled,
-                modifier = Modifier.align(Alignment.CenterVertically)
-            )
-            Switch(
-                checked = syncEnabledState.value,
-                onCheckedChange = null,
-                colors = SwitchDefaults.colors(
-                    checkedThumbColor = MaterialTheme.colorScheme.primary,
-                    checkedTrackColor = MaterialTheme.colorScheme.primaryContainer
-                )
-            )
         }
-    }
+    )
 }
 
 fun isSyncEnabled(context: Context): Boolean {

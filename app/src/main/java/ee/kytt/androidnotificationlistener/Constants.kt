@@ -13,6 +13,5 @@ object Constants {
     const val PREF_SYNC_ENABLED = "sync_enabled"
     const val BACKGROUND_WORK_NAME = "notification_sync"
     const val MANUAL_WORK_NAME = "manual_sync"
-    const val SETTINGS_INTENT = "android.settings.ACTION_NOTIFICATION_LISTENER_SETTINGS"
     const val SETTINGS_URI = "enabled_notification_listeners"
 }

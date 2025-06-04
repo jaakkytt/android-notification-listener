@@ -6,14 +6,7 @@ import android.database.ContentObserver
 import android.os.Handler
 import android.os.Looper
 import android.provider.Settings
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.material3.Button
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Switch
-import androidx.compose.material3.SwitchDefaults
-import androidx.compose.material3.Text
+import android.provider.Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
@@ -21,27 +14,18 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
-import ee.kytt.androidnotificationlistener.Constants.SETTINGS_INTENT
 import ee.kytt.androidnotificationlistener.Constants.SETTINGS_URI
 import ee.kytt.androidnotificationlistener.R
 
 @Composable
-fun EnableNotificationsButton(
-    context: Context,
-    modifier: Modifier
-) {
+fun EnableNotificationsButton(context: Context) {
     var enabled by remember { mutableStateOf(isNotificationListenerEnabled(context)) }
     val lifecycleOwner = LocalLifecycleOwner.current
     val currentContext by rememberUpdatedState(context)
-
-    var labelNotificationAccessEnabled = stringResource(R.string.notification_access_enabled)
-    var labelNotificationAccessDisabled = stringResource(R.string.notification_access_disabled)
 
     DisposableEffect(lifecycleOwner) {
         val observer = LifecycleEventObserver { _, event ->
@@ -72,30 +56,14 @@ fun EnableNotificationsButton(
         }
     }
 
-    Button(
+    SettingSwitch(
+        title = stringResource(R.string.allow_notification_access),
+        checked = enabled,
+        description = stringResource(R.string.allow_notification_access_description),
         onClick = {
-            context.startActivity(Intent(SETTINGS_INTENT))
-        },
-        modifier = modifier.fillMaxWidth()
-    ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            Text(
-                text = if (enabled) labelNotificationAccessEnabled else labelNotificationAccessDisabled,
-                modifier = Modifier.align(Alignment.CenterVertically)
-            )
-            Switch(
-                checked = enabled,
-                onCheckedChange = null,
-                colors = SwitchDefaults.colors(
-                    checkedThumbColor = MaterialTheme.colorScheme.primary,
-                    checkedTrackColor = MaterialTheme.colorScheme.primaryContainer
-                )
-            )
+            context.startActivity(Intent(ACTION_NOTIFICATION_LISTENER_SETTINGS))
         }
-    }
+    )
 }
 
 fun isNotificationListenerEnabled(context: Context): Boolean {
