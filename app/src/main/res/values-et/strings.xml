@@ -30,4 +30,12 @@
     <string name="latest_sync_error">Viimane veateade</string>
     <string name="datetime_format">dd.MM.yyyy HH:mm</string>
     <string name="datetime_never">pole</string>
+    <string name="sync_chart_title">Sünkimise ajalugu</string>
+    <string name="weekday_short_mon">E</string>
+    <string name="weekday_short_tue">T</string>
+    <string name="weekday_short_wed">K</string>
+    <string name="weekday_short_thu">N</string>
+    <string name="weekday_short_fri">R</string>
+    <string name="weekday_short_sat">L</string>
+    <string name="weekday_short_sun">P</string>
 </resources>

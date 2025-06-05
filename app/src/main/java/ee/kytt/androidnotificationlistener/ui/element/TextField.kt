@@ -1,8 +1,7 @@
-package ee.kytt.androidnotificationlistener.ui
+package ee.kytt.androidnotificationlistener.ui.element
 
 import android.content.Context
-import android.util.Log
-import androidx.activity.ComponentActivity
+import android.content.Context.MODE_PRIVATE
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -23,7 +22,7 @@ fun TextField(
     labelNotSet: String,
     description: String
 ) {
-    val prefs = context.getSharedPreferences(PREFS_NAME, ComponentActivity.MODE_PRIVATE)
+    val prefs = context.getSharedPreferences(PREFS_NAME, MODE_PRIVATE)
     var textValue by remember {
         mutableStateOf(prefs.getString(prefKey, "") ?: "")
     }
@@ -33,7 +32,6 @@ fun TextField(
         onValueChange = {
             textValue = it
             prefs.edit() { putString(prefKey, textValue) }
-            Log.d("TextField", "Text value is set to: $textValue")
         },
         label = {
             Text(if (textValue.isNotEmpty()) labelSet else labelNotSet)

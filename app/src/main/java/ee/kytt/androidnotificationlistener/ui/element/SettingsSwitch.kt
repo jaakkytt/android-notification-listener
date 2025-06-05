@@ -1,4 +1,4 @@
-package ee.kytt.androidnotificationlistener.ui
+package ee.kytt.androidnotificationlistener.ui.element
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Row

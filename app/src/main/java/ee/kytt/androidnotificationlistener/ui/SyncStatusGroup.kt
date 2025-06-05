@@ -1,8 +1,8 @@
 package ee.kytt.androidnotificationlistener.ui
 
 import android.content.Context
+import android.content.Context.MODE_PRIVATE
 import android.content.SharedPreferences
-import androidx.activity.ComponentActivity
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.HorizontalDivider
@@ -25,6 +25,7 @@ import ee.kytt.androidnotificationlistener.Constants.PREF_LATEST_PACKAGE_NAME
 import ee.kytt.androidnotificationlistener.Constants.PREF_LATEST_STATUS
 import ee.kytt.androidnotificationlistener.Constants.PREF_LATEST_TITLE
 import ee.kytt.androidnotificationlistener.R
+import ee.kytt.androidnotificationlistener.ui.element.ContentGroup
 import ee.kytt.androidnotificationlistener.ui.theme.Green
 import ee.kytt.androidnotificationlistener.ui.theme.Red
 import java.time.Instant
@@ -35,7 +36,7 @@ import java.time.format.DateTimeFormatter
 fun SyncStatusGroup(
     context: Context
 ) {
-    val prefs = context.getSharedPreferences(PREFS_NAME, ComponentActivity.MODE_PRIVATE)
+    val prefs = context.getSharedPreferences(PREFS_NAME, MODE_PRIVATE)
 
     val latestTitle = remember { mutableStateOf(prefs.getString(PREF_LATEST_TITLE, "") ?: "") }
     val latestPackage = remember { mutableStateOf(prefs.getString(PREF_LATEST_PACKAGE_NAME, "-") ?: "-") }
@@ -84,13 +85,37 @@ fun SyncStatusGroup(
 
     ContentGroup(title = stringResource(R.string.sync_status)) {
         if (isSuccess) {
-            StatusText("${labelLastSynced}: ${formatTimestamp(lastSuccessTime.longValue, labelDatetimeNever, labelDatetimeFormat)}")
+            StatusText(
+                "${labelLastSynced}: ${
+                    formatTimestamp(
+                        lastSuccessTime.longValue,
+                        labelDatetimeNever,
+                        labelDatetimeFormat
+                    )
+                }"
+            )
             StatusText(latestPackage.value)
             StatusText(latestTitle.value)
         } else {
             StatusText("${labelUnsyncedEntries}: ${failCount.intValue}")
-            StatusText("${labelLatestAttempt}: ${formatTimestamp(latestAttemptTime.longValue, labelDatetimeNever, labelDatetimeFormat)}")
-            StatusText("${labelLastSynced}: ${formatTimestamp(lastSuccessTime.longValue, labelDatetimeNever, labelDatetimeFormat)}")
+            StatusText(
+                "${labelLatestAttempt}: ${
+                    formatTimestamp(
+                        latestAttemptTime.longValue,
+                        labelDatetimeNever,
+                        labelDatetimeFormat
+                    )
+                }"
+            )
+            StatusText(
+                "${labelLastSynced}: ${
+                    formatTimestamp(
+                        lastSuccessTime.longValue,
+                        labelDatetimeNever,
+                        labelDatetimeFormat
+                    )
+                }"
+            )
             HorizontalDivider(modifier = Modifier.padding(vertical = 16.dp))
             SyncNowButton(context, Modifier.fillMaxWidth())
         }

@@ -21,6 +21,7 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import com.google.common.util.concurrent.ListenableFuture
 import ee.kytt.androidnotificationlistener.R
+import ee.kytt.androidnotificationlistener.ui.element.SettingSwitch
 import kotlinx.coroutines.launch
 import java.util.concurrent.Executor
 

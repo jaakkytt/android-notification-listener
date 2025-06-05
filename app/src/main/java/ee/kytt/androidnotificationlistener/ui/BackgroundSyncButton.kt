@@ -16,6 +16,7 @@ import ee.kytt.androidnotificationlistener.Constants.PREFS_NAME
 import ee.kytt.androidnotificationlistener.Constants.PREF_SYNC_ENABLED
 import ee.kytt.androidnotificationlistener.R
 import ee.kytt.androidnotificationlistener.service.NotificationSyncWorker
+import ee.kytt.androidnotificationlistener.ui.element.SettingSwitch
 import java.util.concurrent.TimeUnit.MINUTES
 
 @Composable

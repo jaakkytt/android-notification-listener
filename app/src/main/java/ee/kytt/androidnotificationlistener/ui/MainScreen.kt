@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -21,6 +20,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import ee.kytt.androidnotificationlistener.R
+import ee.kytt.androidnotificationlistener.ui.element.ContentGroup
 
 @Composable
 fun MainScreen(
@@ -51,6 +51,9 @@ fun MainScreen(
 
         Spacer(modifier = Modifier.height(32.dp))
 
+        ContentGroup(title = stringResource(R.string.sync_chart_title)) {
+            WeeklyChart(context)
+        }
 
         SyncStatusGroup(context)
 

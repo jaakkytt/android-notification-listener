@@ -1,4 +1,4 @@
-package ee.kytt.androidnotificationlistener.ui
+package ee.kytt.androidnotificationlistener.ui.element
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope

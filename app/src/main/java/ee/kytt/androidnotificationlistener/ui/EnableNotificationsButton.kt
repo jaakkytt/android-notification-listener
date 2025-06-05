@@ -20,6 +20,7 @@ import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import ee.kytt.androidnotificationlistener.Constants.SETTINGS_URI
 import ee.kytt.androidnotificationlistener.R
+import ee.kytt.androidnotificationlistener.ui.element.SettingSwitch
 
 @Composable
 fun EnableNotificationsButton(context: Context) {

@@ -30,4 +30,12 @@
     <string name="latest_sync_error">Latest error</string>
     <string name="datetime_format">yyyy-MM-dd HH:mm</string>
     <string name="datetime_never">never</string>
+    <string name="sync_chart_title">Sync History</string>
+    <string name="weekday_short_mon">Mon</string>
+    <string name="weekday_short_tue">Tue</string>
+    <string name="weekday_short_wed">Wed</string>
+    <string name="weekday_short_thu">Thu</string>
+    <string name="weekday_short_fri">Fri</string>
+    <string name="weekday_short_sat">Sat</string>
+    <string name="weekday_short_sun">Sun</string>
 </resources>

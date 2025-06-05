@@ -1,4 +1,4 @@
-package ee.kytt.androidnotificationlistener.ui
+package ee.kytt.androidnotificationlistener.ui.element
 
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
