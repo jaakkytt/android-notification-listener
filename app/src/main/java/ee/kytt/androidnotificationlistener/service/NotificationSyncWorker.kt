@@ -38,14 +38,14 @@ class NotificationSyncWorker(
 
         val db = NotificationDatabase.getDatabase(applicationContext)
         val dao = db.notificationDao()
-        val failedNotifications = dao.getAll()
+        val failedNotifications = dao.getFailed()
         var failedCount = failedNotifications.size
 
         for (notification in failedNotifications) {
             val response = callbackService.sendSync(url, token, notification)
 
             if (response.success) {
-                dao.delete(notification.id)
+                dao.markSynced(notification.id)
                 Log.d("NotificationSyncWorker", "Resent and deleted notification: ${notification.id}")
                 prefs.edit().apply {
                     putString(PREF_LATEST_TITLE, notification.description())

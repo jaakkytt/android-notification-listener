@@ -54,6 +54,7 @@ class NotificationListener : NotificationListenerService() {
             if (!result.success) {
                 saveFailedNotification(notification, context, result)
             } else {
+                saveSyncedNotification(notification, context)
                 prefs.edit().apply {
                     putString(PREF_LATEST_TITLE, notification.description())
                     putString(PREF_LATEST_PACKAGE_NAME, notification.packageName)
@@ -71,8 +72,10 @@ class NotificationListener : NotificationListenerService() {
         CoroutineScope(Dispatchers.IO).launch {
             val db = NotificationDatabase.Companion.getDatabase(context)
             db.notificationDao().insert(notification)
-            val failed = db.notificationDao().count()
+            val failed = db.notificationDao().countFailed()
+
             Log.d("NotificationListener", "Saved failed notification to local DB, unsynced count: $failed")
+
             context.getSharedPreferences(PREFS_NAME, MODE_PRIVATE).edit().apply {
                 putInt(PREF_FAIL_COUNT, failed)
                 putString(PREF_LATEST_STATUS, result.status)
@@ -80,6 +83,13 @@ class NotificationListener : NotificationListenerService() {
                 putLong(PREF_LATEST_ATTEMPT_TIME, System.currentTimeMillis())
                 apply()
             }
+        }
+    }
+
+    private fun saveSyncedNotification(notification: Notification, context: Context) {
+        CoroutineScope(Dispatchers.IO).launch {
+            val db = NotificationDatabase.Companion.getDatabase(context)
+            db.notificationDao().insert(notification.copy(synchronized = true))
         }
     }
 

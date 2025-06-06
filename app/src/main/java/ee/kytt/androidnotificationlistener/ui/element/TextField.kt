@@ -2,6 +2,7 @@ package ee.kytt.androidnotificationlistener.ui.element
 
 import android.content.Context
 import android.content.Context.MODE_PRIVATE
+import android.util.Log
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text

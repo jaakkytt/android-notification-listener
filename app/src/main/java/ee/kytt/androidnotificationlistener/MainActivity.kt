@@ -14,11 +14,19 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.work.Constraints
+import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.PeriodicWorkRequestBuilder
+import androidx.work.WorkManager
+import ee.kytt.androidnotificationlistener.Constants.CLEANUP_WORK_NAME
+import ee.kytt.androidnotificationlistener.service.CleanupWorker
 import ee.kytt.androidnotificationlistener.ui.MainScreen
 import ee.kytt.androidnotificationlistener.ui.SettingsScreen
 import ee.kytt.androidnotificationlistener.ui.theme.AndroidNotificationListenerTheme
+import java.util.concurrent.TimeUnit
 
 class MainActivity : ComponentActivity() {
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -31,7 +39,22 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
+
+        val constraint = Constraints.Builder()
+            .setRequiresBatteryNotLow(true)
+            .build()
+
+        val cleanupRequest = PeriodicWorkRequestBuilder<CleanupWorker>(1, TimeUnit.DAYS)
+            .setConstraints(constraint)
+            .build()
+
+        WorkManager.getInstance(applicationContext).enqueueUniquePeriodicWork(
+            CLEANUP_WORK_NAME,
+            ExistingPeriodicWorkPolicy.KEEP,
+            cleanupRequest
+        )
     }
+
 }
 
 @Preview(showBackground = true)

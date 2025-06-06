@@ -1,22 +1,55 @@
 package ee.kytt.androidnotificationlistener.ui
 
 import android.content.Context
+import android.content.Context.MODE_PRIVATE
+import android.content.SharedPreferences
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import com.github.mikephil.charting.data.BarEntry
+import ee.kytt.androidnotificationlistener.Constants.PREFS_NAME
+import ee.kytt.androidnotificationlistener.Constants.PREF_LATEST_ATTEMPT_TIME
 import ee.kytt.androidnotificationlistener.R
+import ee.kytt.androidnotificationlistener.persistence.NotificationDatabase
 import ee.kytt.androidnotificationlistener.ui.element.Chart
 import ee.kytt.androidnotificationlistener.ui.theme.Green
 import ee.kytt.androidnotificationlistener.ui.theme.Red
+import kotlinx.coroutines.launch
 import java.time.LocalDate
-import kotlin.random.Random
 
 @Composable
 fun WeeklyChart(
     context: Context,
     modifier: Modifier = Modifier
 ) {
+    val prefs = context.getSharedPreferences(PREFS_NAME, MODE_PRIVATE)
+    val entriesState = remember { mutableStateOf<List<BarEntry>>(emptyList()) }
+    val coroutineScope = rememberCoroutineScope()
+
+    DisposableEffect(Unit) {
+        val listener = SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
+            if (key == PREF_LATEST_ATTEMPT_TIME) {
+                coroutineScope.launch {
+                    entriesState.value = generateEntries(context)
+                }
+            }
+        }
+        prefs.registerOnSharedPreferenceChangeListener(listener)
+
+        onDispose {
+            prefs.unregisterOnSharedPreferenceChangeListener(listener)
+        }
+    }
+
+    LaunchedEffect(Unit) {
+        entriesState.value = generateEntries(context)
+    }
+
     val dayLabels = listOf(
         R.string.weekday_short_mon,
         R.string.weekday_short_tue,
@@ -30,15 +63,27 @@ fun WeeklyChart(
     val todayIndex = LocalDate.now().dayOfWeek.value % 7
     val rotatedDayLabels = dayLabels.drop(todayIndex) + dayLabels.take(todayIndex)
 
-    val fakeData = List(7) {
-        val synced = Random.nextInt(0, 50)
-        val unsynced = Random.nextInt(0, 30)
-        floatArrayOf(synced.toFloat(), unsynced.toFloat())
-    }
+    Chart(modifier, rotatedDayLabels, entriesState.value, listOf(Green, Red))
+}
 
-    val entries = fakeData.mapIndexed { index, (synced, unsynced) ->
-        BarEntry(index.toFloat(), floatArrayOf(synced, unsynced))
-    }
+suspend fun generateEntries(context: Context): List<BarEntry> {
+    val db = NotificationDatabase.getDatabase(context)
+    val dao = db.notificationDao()
 
-    Chart(modifier, rotatedDayLabels, entries, listOf(Green, Red))
+    val startDay = LocalDate.now().minusDays(6).toEpochDay()
+    val chartData = dao.getChartData(startDay)
+
+    val dayToEntry = chartData.associateBy { it.day }
+
+    return (0..6).map { i ->
+        val day = LocalDate.now().minusDays((6 - i).toLong()).toEpochDay()
+        val data = dayToEntry[day]
+        BarEntry(
+            i.toFloat(),
+            floatArrayOf(
+                data?.syncedCount?.toFloat() ?: 0f,
+                data?.unsyncedCount?.toFloat() ?: 0f
+            )
+        )
+    }
 }

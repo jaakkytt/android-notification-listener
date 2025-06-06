@@ -77,6 +77,7 @@ fun getAutoRevokeStatus(context: Context, callback: (Int) -> Unit) {
     future.addListener(Runnable {
             try {
                 val status = future.get()
+                Log.d("AutoRevokeStatusButton", "Auto-revoke status: $status")
                 callback(status)
             } catch (e: Exception) {
                 Log.w("AutoRevokeStatusButton", "Failed to get auto-revoke status", e)
