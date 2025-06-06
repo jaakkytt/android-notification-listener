@@ -6,7 +6,7 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import ee.kytt.androidnotificationlistener.data.Notification
 
-@Database(entities = [Notification::class], version = 2)
+@Database(entities = [Notification::class], version = 3)
 abstract class NotificationDatabase : RoomDatabase() {
 
     abstract fun notificationDao(): NotificationDao

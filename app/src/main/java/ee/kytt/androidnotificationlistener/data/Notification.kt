@@ -19,6 +19,7 @@ import java.time.ZoneId
 data class Notification(
     val id: String,
     val packageName: String,
+    val key: String,
     val title: String,
     val text: String,
     val subText: String,
@@ -44,6 +45,7 @@ data class Notification(
     constructor(sbn: StatusBarNotification) : this(
         id = hashId("${sbn.packageName}|${sbn.key}|${sbn.postTime}"),
         packageName = sbn.packageName,
+        key = sbn.key,
         title = sbn.notification.extras.getString(EXTRA_TITLE, ""),
         text = sbn.notification.extras.getCharSequence(EXTRA_TEXT, "").toString(),
         subText = sbn.notification.extras.getCharSequence(EXTRA_SUB_TEXT, "").toString(),

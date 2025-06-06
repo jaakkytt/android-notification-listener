@@ -22,7 +22,7 @@ interface NotificationDao {
     @Query("UPDATE notifications SET synchronized = 1 WHERE id = :id")
     suspend fun markSynced(id: String)
 
-    @Query("DELETE FROM notifications WHERE time < :thresholdTime")
+    @Query("DELETE FROM notifications WHERE time < :thresholdTime AND synchronized = 1")
     suspend fun deleteOlderThan(thresholdTime: Long)
 
     @Query("""
