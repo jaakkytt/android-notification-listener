@@ -3,7 +3,7 @@
 [![GitHub license](https://img.shields.io/github/license/jaakkytt/android-notification-listener)](./LICENSE)
 [![GitHub issues](https://img.shields.io/github/issues/jaakkytt/android-notification-listener)](https://github.com/jaakkytt/android-notification-listener/issues)
 
-<p style="text-align: center;">
+<p align="center">
   <img src="./app/src/main/ic_launcher-playstore.png" alt="logo" width="64" height="64">
 </p>
 
