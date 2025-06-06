@@ -1,17 +1,8 @@
-# Android Notification Listener
-
-[![GitHub license](https://img.shields.io/github/license/jaakkytt/android-notification-listener)](./LICENSE)
-[![GitHub issues](https://img.shields.io/github/issues/jaakkytt/android-notification-listener)](https://github.com/jaakkytt/android-notification-listener/issues)
-
-<p align="center">
-  <img src="./app/src/main/ic_launcher-playstore.png" alt="logo" width="64" height="64">
-</p>
+# ![Logo](./images/logo.png) Android Notification Listener
 
 A simple Android app that listens to notifications from other apps and sends them to a user defined server for further processing.
 
-![All synced](./images/screen_ok.jpg)
-
-The Notification payload is sent to the server in format as the example below:
+The notification payload is sent to the server in format as the example below:
 
 ```json
 {
@@ -31,6 +22,10 @@ Notifications are sent as they are received, but also stored in a local database
 Background sync for unsynced notifications is attempted every 15 minutes, and the app will retry sending notifications until the server acknowledges them with a [200..300) HTTP status code.
 
 Remote server URL and optional authentication token can be set in the app settings (see below for example screenshots).
+
+## Preview
+
+![All synced](./images/screen_ok.jpg)
 
 ## Installing dev version via Android Studio
 
